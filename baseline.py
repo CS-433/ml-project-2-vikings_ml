@@ -155,8 +155,8 @@ def main(argv=None):  # pylint: disable=unused-argument
     fc2_weights = tf.Variable(
         tf.random.truncated_normal([512, cfg.NUM_LABELS],
                             stddev=0.1,
-                            seed=SEED))
-    fc2_biases = tf.Variable(tf.constant(0.1, shape=[NUM_LABELS]))
+                            seed=cfg.SEED))
+    fc2_biases = tf.Variable(tf.constant(0.1, shape=[cfg.NUM_LABELS]))
 
     # Make an image summary for 4d tensor image with index idx
     def get_image_summary(img, idx=0):
