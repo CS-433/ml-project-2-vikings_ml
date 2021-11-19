@@ -6,7 +6,6 @@ Credits: Aurelien Lucchi, ETH Zürich
 
 Code updated to be compatible with TensorFlow 2.x
 """
-#%%
 import gzip
 import os
 from re import A
@@ -14,8 +13,9 @@ import sys
 import urllib
 import matplotlib.image as mpimg
 from PIL import Image
-from src.helpers.handling_images import img_crop, extract_data
+from src.helpers.handling_images import img_crop, extract_data, extract_labels
 import config as cfg
+from src.helpers.helpers import error_rate
 
 import code
 
@@ -29,47 +29,6 @@ tf.compat.v1.app.flags.DEFINE_string('train_dir', '/tmp/segment_aerial_images',
                            """Directory where to write event logs """
                            """and checkpoint.""")
 FLAGS = tf.compat.v1.app.flags.FLAGS
-
-
-# Assign a label to a patch v
-def value_to_class(v):
-    foreground_threshold = 0.25  # percentage of pixels > 1 required to assign a foreground label to a patch
-    df = numpy.sum(v)
-    if df > foreground_threshold:  # road
-        return [0, 1]
-    else:  # bgrd
-        return [1, 0]
-
-
-# Extract label images
-def extract_labels(filename, num_images):
-    """Extract the labels into a 1-hot matrix [image index, label index]."""
-    gt_imgs = []
-    for i in range(1, num_images + 1):
-        imageid = "satImage_%.3d" % i
-        image_filename = filename + imageid + ".png"
-        if os.path.isfile(image_filename):
-            print('Loading ' + image_filename)
-            img = mpimg.imread(image_filename)
-            gt_imgs.append(img)
-        else:
-            print('File ' + image_filename + ' does not exist')
-
-    num_images = len(gt_imgs)
-    gt_patches = [img_crop(gt_imgs[i], cfg.IMG_PATCH_SIZE, cfg.IMG_PATCH_SIZE) for i in range(num_images)]
-    data = numpy.asarray([gt_patches[i][j] for i in range(len(gt_patches)) for j in range(len(gt_patches[i]))])
-    labels = numpy.asarray([value_to_class(numpy.mean(data[i])) for i in range(len(data))])
-
-    # Convert to dense 1-hot representation.
-    return labels.astype(numpy.float32)
-
-
-def error_rate(predictions, labels):
-    """Return the error rate based on dense predictions and 1-hot labels."""
-    return 100.0 - (
-        100.0 *
-        numpy.sum(numpy.argmax(predictions, 1) == numpy.argmax(labels, 1)) /
-        predictions.shape[0])
 
 
 # Convert array of labels to an image
