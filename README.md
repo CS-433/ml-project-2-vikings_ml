@@ -5,9 +5,12 @@ The project should be structured as the following picture (ish):
 
 __data__ - Self explanatory
 
-__predictions__ - Containing predicted images and submission files\\
+__predictions__ - Containing predicted images and submission files
 
-__models__ - Containing saved models to avoid retraining\\
+__models__ - Containing saved models to avoid retraining
+
 __src__ - containing all code and functions
+
 __ModelStatistics.xlsx__ - Excel sheet with information on every trained model to enable reproducibility
+
 __notebooks__ Notebooks for playing around
