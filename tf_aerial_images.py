@@ -29,7 +29,7 @@ TRAINING_SIZE = 20
 VALIDATION_SIZE = 5  # Size of the validation set.
 SEED = 66478  # Set to None for random seed.
 BATCH_SIZE = 16  # 64
-NUM_EPOCHS = 100
+NUM_EPOCHS = 100    
 RESTORE_MODEL = True  # If True, restore existing model instead of training a new one
 RECORDING_STEP = 0
 
@@ -520,22 +520,40 @@ def main(argv=None):  # pylint: disable=unused-argument
         prediction_training_dir = "predictions_training/"
         if not os.path.isdir(prediction_training_dir):
             os.mkdir(prediction_training_dir)
+        """
         for i in range(1, TRAINING_SIZE + 1):
             pimg = get_prediction_with_groundtruth(train_data_filename, i)
             Image.fromarray(pimg).save(prediction_training_dir + "prediction_" + str(i) + ".png")
             oimg = get_prediction_with_overlay(train_data_filename, i)
             oimg.save(prediction_training_dir + "overlay_" + str(i) + ".png") 
+        """
         print('Predicting on testset')
-        testing_dir = 'test_set_images/' + 'test_set_images/'
-        test_images = 'predictions_testing/'
+        testing_dir = 'test_set_images/' + 'test_set_images/' #path for test images
+        test_images = 'predictions_testing/' #path to save test predictions
+
+        # creating test predictions
         for i in range(1,51):
-            imgpath = testing_dir + 'test_%d/'%i + 'test_%d.png'%i
+            print('predicting image %d'%i)
+            imgpath = testing_dir + 'test_%d/'%i + 'test_%d.png'%i #the path for test image i
+
+            # generating prediction
             pimg = get_prediction(mpimg.imread(imgpath))
-            img = mpimg.imread(imgpath)
-            cimg = concatenate_images(pimg, img)
-            img = Image.fromarray(cimg)
+
+            #converting prediction such that it can be visualized
+            w = pimg.shape[0]
+            h = pimg.shape[1]
+            gt_img_3c = numpy.zeros((w, h, 3), dtype=numpy.uint8)
+            gt_img8 = img_float_to_uint8(pimg)          
+            gt_img_3c[:, :, 0] = gt_img8
+            gt_img_3c[:, :, 1] = gt_img8
+            gt_img_3c[:, :, 2] = gt_img8
+
+            #creating image from array for viz purposes
+            img = Image.fromarray(gt_img_3c)
+            #saving the prediction image
             img.save(test_images + 'prediction_' + str(i) + '.png')
 
+            #saving predictions with overlay over groundtruth
             img = mpimg.imread(imgpath)
             img_prediction = get_prediction(img)
             oimg = make_img_overlay(img, img_prediction)
