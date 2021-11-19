@@ -198,11 +198,9 @@ def make_img_overlay(img, predicted_img):
 
 def main(argv=None):  # pylint: disable=unused-argument
     tf.compat.v1.disable_eager_execution()
-    data_dir = 'training/'
+    data_dir = 'data/training/'
     train_data_filename = data_dir + 'images/'
     train_labels_filename = data_dir + 'groundtruth/' 
-
-    testing_dir = 'test_set_images'+'test_set_images/' 
 
     # Extract it into numpy arrays.
     train_data = extract_data(train_data_filename, TRAINING_SIZE)
@@ -520,16 +518,17 @@ def main(argv=None):  # pylint: disable=unused-argument
         prediction_training_dir = "predictions_training/"
         if not os.path.isdir(prediction_training_dir):
             os.mkdir(prediction_training_dir)
-        """
+        
         for i in range(1, TRAINING_SIZE + 1):
             pimg = get_prediction_with_groundtruth(train_data_filename, i)
             Image.fromarray(pimg).save(prediction_training_dir + "prediction_" + str(i) + ".png")
             oimg = get_prediction_with_overlay(train_data_filename, i)
             oimg.save(prediction_training_dir + "overlay_" + str(i) + ".png") 
-        """
+        
         print('Predicting on testset')
-        testing_dir = 'test_set_images/' + 'test_set_images/' #path for test images
-        test_images = 'predictions_testing/' #path to save test predictions
+
+        testing_dir = 'data/testing/' #path for test images
+        test_images = 'predictions/testing/' #path to save test predictions
 
         # creating test predictions
         for i in range(1,51):
