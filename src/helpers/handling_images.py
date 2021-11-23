@@ -137,7 +137,7 @@ def extract_labels(filename, num_images):
             if os.path.isfile(image_filename):
                 print('Loading ' + image_filename)
                 img = mpimg.imread(image_filename)
-                gt_imgs.append(img)
+                gt_imgs.append(img[:,:,0])
             else:
                 print('File ' + image_filename + ' does not exist')
 
