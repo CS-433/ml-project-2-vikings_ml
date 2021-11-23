@@ -51,7 +51,7 @@ def extract_data(filename, num_images):
         A numpy array containting the images
     """
     imgs = []
-    for i in range(1, num_images+1):
+    for i in range(1, 100 + 1):
         imageid = "satImage_%.3d" % i
         image_filename = filename + imageid + ".png"
         if os.path.isfile(image_filename):
@@ -60,6 +60,17 @@ def extract_data(filename, num_images):
             imgs.append(img)
         else:
             print('File ' + image_filename + ' does not exist')
+        
+        for j in range(16):
+            imageid = "satImage_%.3d" % i
+            imageid += '_Aug%.2d' % j
+            image_filename = filename + imageid + '.png'
+            if os.path.isfile(image_filename):
+                print('Loading ' + image_filename)
+                img = mpimg.imread(image_filename)
+                imgs.append(img)
+            else:
+                print('File ' + image_filename + ' does not exist')
 
     num_images = len(imgs)
     cfg.IMG_WIDTH = imgs[0].shape[0]
@@ -108,15 +119,27 @@ def extract_labels(filename, num_images):
         1-hot matrix [image index, label index]
     """
     gt_imgs = []
-    for i in range(1, num_images + 1):
+    for i in range(1, 100 + 1):
         imageid = "satImage_%.3d" % i
         image_filename = filename + imageid + ".png"
         if os.path.isfile(image_filename):
             print('Loading ' + image_filename)
             img = mpimg.imread(image_filename)
             gt_imgs.append(img)
+
         else:
-            print('File ' + image_filename + ' does not exist')
+                print('File ' + image_filename + ' does not exist')
+
+        for j in range(16):
+            imageid = "satImage_%.3d" % i
+            imageid += '_Aug%.2d' % j
+            image_filename = filename + imageid + '.png'
+            if os.path.isfile(image_filename):
+                print('Loading ' + image_filename)
+                img = mpimg.imread(image_filename)
+                gt_imgs.append(img)
+            else:
+                print('File ' + image_filename + ' does not exist')
 
     num_images = len(gt_imgs)
     gt_patches = [img_crop(gt_imgs[i], cfg.IMG_PATCH_SIZE, cfg.IMG_PATCH_SIZE) for i in range(num_images)]
