@@ -83,15 +83,22 @@ def make_img_overlay(img, predicted_img):
 
 
 def main(argv=None):  # pylint: disable=unused-argument
+
+    # Added to be able to run as Tensorflow 2
     tf.compat.v1.disable_eager_execution()
     data_dir = 'data/training/'
     train_data_filename = data_dir + 'images/'
     train_labels_filename = data_dir + 'groundtruth/' 
 
     # Extract it into numpy arrays.
+    # train_data here contains a list with standardized RGB values in the most inner array, 
+    # inside patches of 16 pixels, inside array of all image pixels, inside array of all images
     train_data = extract_data(train_data_filename, cfg.TRAINING_SIZE)
+
+    # The same yields for the labels
     train_labels = extract_labels(train_labels_filename, cfg.TRAINING_SIZE)
 
+    # Can be considered as an equivalent to iterations
     num_epochs = cfg.NUM_EPOCHS
 
     c0 = 0  # bgrd
@@ -157,30 +164,6 @@ def main(argv=None):  # pylint: disable=unused-argument
                             stddev=0.1,
                             seed=cfg.SEED))
     fc2_biases = tf.Variable(tf.constant(0.1, shape=[cfg.NUM_LABELS]))
-
-    # Make an image summary for 4d tensor image with index idx
-    def get_image_summary(img, idx=0):
-        V = tf.slice(img, (0, 0, 0, idx), (1, -1, -1, 1))
-        img_w = img.get_shape().as_list()[1]
-        img_h = img.get_shape().as_list()[2]
-        min_value = tf.reduce_min(input_tensor=V)
-        V = V - min_value
-        max_value = tf.reduce_max(input_tensor=V)
-        V = V / (max_value*cfg.PIXEL_DEPTH)
-        V = tf.reshape(V, (img_w, img_h, 1))
-        V = tf.transpose(a=V, perm=(2, 0, 1))
-        V = tf.reshape(V, (-1, img_w, img_h, 1))
-        return V
-    
-    # Make an image summary for 3d tensor image with index idx
-    def get_image_summary_3d(img):
-        V = tf.slice(img, (0, 0, 0), (1, -1, -1))
-        img_w = img.get_shape().as_list()[1]
-        img_h = img.get_shape().as_list()[2]
-        V = tf.reshape(V, (img_w, img_h, 1))
-        V = tf.transpose(a=V, perm=(2, 0, 1))
-        V = tf.reshape(V, (-1, img_w, img_h, 1))
-        return V
 
     # Get prediction for given input image 
     def get_prediction(img):
@@ -268,18 +251,6 @@ def main(argv=None):  # pylint: disable=unused-argument
         #    hidden = tf.nn.dropout(hidden, 0.5, seed=SEED)
         out = tf.matmul(hidden, fc2_weights) + fc2_biases
 
-        if train:
-            summary_id = '_0'
-            s_data = get_image_summary(data)
-            tf.compat.v1.summary.image('summary_data' + summary_id, s_data, max_outputs=3)
-            s_conv = get_image_summary(conv)
-            tf.compat.v1.summary.image('summary_conv' + summary_id, s_conv, max_outputs=3)
-            s_pool = get_image_summary(pool)
-            tf.compat.v1.summary.image('summary_pool' + summary_id, s_pool, max_outputs=3)
-            s_conv2 = get_image_summary(conv2)
-            tf.compat.v1.summary.image('summary_conv2' + summary_id, s_conv2, max_outputs=3)
-            s_pool2 = get_image_summary(pool2)
-            tf.compat.v1.summary.image('summary_pool2' + summary_id, s_pool2, max_outputs=3)
         return out
 
     # Training computation: logits + cross-entropy loss.
