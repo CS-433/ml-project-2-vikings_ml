@@ -122,6 +122,7 @@ def extract_labels(filename, num_images):
     gt_patches = [img_crop(gt_imgs[i], cfg.IMG_PATCH_SIZE, cfg.IMG_PATCH_SIZE) for i in range(num_images)]
     data = np.asarray([gt_patches[i][j] for i in range(len(gt_patches)) for j in range(len(gt_patches[i]))])
     labels = np.asarray([value_to_class(np.mean(data[i])) for i in range(len(data))])
-    labels = labels.astype(np.float32)
     # Convert to dense 1-hot representation.
+    labels = labels.astype(np.float32)
+    
     return labels
