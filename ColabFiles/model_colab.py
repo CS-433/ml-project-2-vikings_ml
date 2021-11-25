@@ -25,12 +25,12 @@ import tensorflow as tf
 NUM_CHANNELS = 3  # RGB images
 PIXEL_DEPTH = 255
 NUM_LABELS = 2
-TRAINING_SIZE = 20
+TRAINING_SIZE = 500
 VALIDATION_SIZE = 5  # Size of the validation set.
 SEED = 66478  # Set to None for random seed.
 BATCH_SIZE = 16  # 64
 NUM_EPOCHS = 100    
-RESTORE_MODEL = True  # If True, restore existing model instead of training a new one
+RESTORE_MODEL = False  # If True, restore existing model instead of training a new one
 RECORDING_STEP = 0
 
 # Set image patch size in pixels
@@ -61,11 +61,23 @@ def img_crop(im, w, h):
 
 
 def extract_data(filename, num_images):
-    """Extract the images into a 4D tensor [image index, y, x, channels].
+    """ (ETH) Extract the images into a 4D tensor [image index, y, x, channels].
     Values are rescaled from [0, 255] down to [-0.5, 0.5].
+
+    Parameters
+    ----------
+    filename: string
+        The name of the image file
+    num_images: int
+        The number of images that should be extracted
+
+    Returns
+    -------
+    data: ndarray
+        A numpy array containting the images
     """
     imgs = []
-    for i in range(1, num_images+1):
+    for i in range(1, 100 + 1):
         imageid = "satImage_%.3d" % i
         image_filename = filename + imageid + ".png"
         if os.path.isfile(image_filename):
@@ -74,6 +86,17 @@ def extract_data(filename, num_images):
             imgs.append(img)
         else:
             print('File ' + image_filename + ' does not exist')
+        
+        for j in range(4):
+            imageid = "satImage_%.3d" % i
+            imageid += '_Aug%.2d' % j
+            image_filename = filename + imageid + '.png'
+            if os.path.isfile(image_filename):
+                print('Loading ' + image_filename)
+                img = mpimg.imread(image_filename)
+                imgs.append(img)
+            else:
+                print('File ' + image_filename + ' does not exist')
 
     num_images = len(imgs)
     IMG_WIDTH = imgs[0].shape[0]
@@ -82,8 +105,8 @@ def extract_data(filename, num_images):
 
     img_patches = [img_crop(imgs[i], IMG_PATCH_SIZE, IMG_PATCH_SIZE) for i in range(num_images)]
     data = [img_patches[i][j] for i in range(len(img_patches)) for j in range(len(img_patches[i]))]
-
-    return numpy.asarray(data)
+    data = numpy.asarray(data)
+    return data
 
 
 # Assign a label to a patch v
@@ -96,27 +119,52 @@ def value_to_class(v):
         return [1, 0]
 
 
-# Extract label images
 def extract_labels(filename, num_images):
-    """Extract the labels into a 1-hot matrix [image index, label index]."""
+    """ (ETH) Extract the labels into a 1-hot matrix [image index, label index].
+    
+    Parameters
+    ----------
+    filename: string
+        The name of the image file
+    num_images: int
+        The number of images
+    
+    Returns
+    --------
+    labels: ndarray
+        1-hot matrix [image index, label index]
+    """
     gt_imgs = []
-    for i in range(1, num_images + 1):
+    for i in range(1, 100 + 1):
         imageid = "satImage_%.3d" % i
         image_filename = filename + imageid + ".png"
         if os.path.isfile(image_filename):
             print('Loading ' + image_filename)
             img = mpimg.imread(image_filename)
             gt_imgs.append(img)
+
         else:
-            print('File ' + image_filename + ' does not exist')
+                print('File ' + image_filename + ' does not exist')
+
+        for j in range(4):
+            imageid = "satImage_%.3d" % i
+            imageid += '_Aug%.2d' % j
+            image_filename = filename + imageid + '.png'
+            if os.path.isfile(image_filename):
+                print('Loading ' + image_filename)
+                img = mpimg.imread(image_filename)
+                gt_imgs.append(img[:,:,0])
+            else:
+                print('File ' + image_filename + ' does not exist')
 
     num_images = len(gt_imgs)
     gt_patches = [img_crop(gt_imgs[i], IMG_PATCH_SIZE, IMG_PATCH_SIZE) for i in range(num_images)]
     data = numpy.asarray([gt_patches[i][j] for i in range(len(gt_patches)) for j in range(len(gt_patches[i]))])
     labels = numpy.asarray([value_to_class(numpy.mean(data[i])) for i in range(len(data))])
-
     # Convert to dense 1-hot representation.
-    return labels.astype(numpy.float32)
+    labels = labels.astype(numpy.float32)
+    
+    return labels
 
 
 def error_rate(predictions, labels):
@@ -198,9 +246,9 @@ def make_img_overlay(img, predicted_img):
 
 def main(argv=None):  # pylint: disable=unused-argument
     tf.compat.v1.disable_eager_execution()
-    data_dir = 'data/training/'
+    data_dir = '/content/drive/MyDrive/training/'
     train_data_filename = data_dir + 'images/'
-    train_labels_filename = data_dir + 'groundtruth/' 
+    train_labels_filename = data_dir + 'groundtruth/'  
 
     # Extract it into numpy arrays.
     train_data = extract_data(train_data_filename, TRAINING_SIZE)
@@ -527,8 +575,8 @@ def main(argv=None):  # pylint: disable=unused-argument
         
         print('Predicting on testset')
 
-        testing_dir = 'data/testing/' #path for test images
-        test_images = 'predictions/testing/' #path to save test predictions
+        testing_dir = '/content/drive/MyDrive/testing/' #path for test images
+        test_images = '/content/drive/MyDrive/predictions/testing/' #path to save test predictions
 
         # creating test predictions
         for i in range(1,51):
