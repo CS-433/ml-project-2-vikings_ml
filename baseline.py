@@ -13,7 +13,7 @@ import sys
 import urllib
 import matplotlib.image as mpimg
 from PIL import Image
-from src.helpers.handling_images import img_crop, extract_data, extract_labels
+from src.helpers.handling_images import img_crop, extract_data, extract_labels, label_to_img, make_img_overlay, concatenate_images, img_float_to_uint8
 import config as cfg
 from src.helpers.helpers import error_rate
 
@@ -29,57 +29,6 @@ tf.compat.v1.app.flags.DEFINE_string('train_dir', '/tmp/segment_aerial_images',
                            """Directory where to write event logs """
                            """and checkpoint.""")
 FLAGS = tf.compat.v1.app.flags.FLAGS
-
-
-# Convert array of labels to an image
-def label_to_img(imgwidth, imgheight, w, h, labels):
-    array_labels = numpy.zeros([imgwidth, imgheight])
-    idx = 0
-    for i in range(0, imgheight, h):
-        for j in range(0, imgwidth, w):
-            if labels[idx][0] > 0.5:  # bgrd
-                l = 0
-            else:
-                l = 1
-            array_labels[j:j+w, i:i+h] = l
-            idx = idx + 1
-    return array_labels
-
-
-def img_float_to_uint8(img):
-    rimg = img - numpy.min(img)
-    rimg = (rimg / numpy.max(rimg) * cfg.PIXEL_DEPTH).round().astype(numpy.uint8)
-    return rimg
-
-
-def concatenate_images(img, gt_img):
-    n_channels = len(gt_img.shape)
-    w = gt_img.shape[0]
-    h = gt_img.shape[1]
-    if n_channels == 3:
-        cimg = numpy.concatenate((img, gt_img), axis=1)
-    else:
-        gt_img_3c = numpy.zeros((w, h, 3), dtype=numpy.uint8)
-        gt_img8 = img_float_to_uint8(gt_img)          
-        gt_img_3c[:, :, 0] = gt_img8
-        gt_img_3c[:, :, 1] = gt_img8
-        gt_img_3c[:, :, 2] = gt_img8
-        img8 = img_float_to_uint8(img)
-        cimg = numpy.concatenate((img8, gt_img_3c), axis=1)
-    return cimg
-
-
-def make_img_overlay(img, predicted_img):
-    w = img.shape[0]
-    h = img.shape[1]
-    color_mask = numpy.zeros((w, h, 3), dtype=numpy.uint8)
-    color_mask[:, :, 0] = predicted_img*cfg.PIXEL_DEPTH
-
-    img8 = img_float_to_uint8(img)
-    background = Image.fromarray(img8, 'RGB').convert("RGBA")
-    overlay = Image.fromarray(color_mask, 'RGB').convert("RGBA")
-    new_img = Image.blend(background, overlay, 0.2)
-    return new_img
 
 
 def main(argv=None):  # pylint: disable=unused-argument

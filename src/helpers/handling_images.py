@@ -3,6 +3,7 @@ import os
 import matplotlib.image as mpimg
 from PIL import Image
 import config as cfg
+import tensorflow as tf
 
 def img_crop(im, w, h):
     ''' (ETH) Extracting patches of width w and height h from an image
@@ -34,7 +35,7 @@ def img_crop(im, w, h):
             list_patches.append(im_patch)
     return list_patches
 
-def extract_data(filename, num_images):
+def extract_data(folderpath):
     """ (ETH) Extract the images into a 4D tensor [image index, y, x, channels].
     Values are rescaled from [0, 255] down to [-0.5, 0.5].
 
@@ -50,27 +51,9 @@ def extract_data(filename, num_images):
     data: ndarray
         A numpy array containting the images
     """
-    imgs = []
-    for i in range(1, 100 + 1):
-        imageid = "satImage_%.3d" % i
-        image_filename = filename + imageid + ".png"
-        if os.path.isfile(image_filename):
-            print('Loading ' + image_filename)
-            img = mpimg.imread(image_filename)
-            imgs.append(img)
-        else:
-            print('File ' + image_filename + ' does not exist')
-        
-        for j in range(16):
-            imageid = "satImage_%.3d" % i
-            imageid += '_Aug%.2d' % j
-            image_filename = filename + imageid + '.png'
-            if os.path.isfile(image_filename):
-                print('Loading ' + image_filename)
-                img = mpimg.imread(image_filename)
-                imgs.append(img)
-            else:
-                print('File ' + image_filename + ' does not exist')
+    files = os.listdir(folderpath)
+    n = len(files)
+    imgs = [mpimg.imread(folderpath+files[i]) for i in range(n)]
 
     num_images = len(imgs)
     cfg.IMG_WIDTH = imgs[0].shape[0]
@@ -103,7 +86,7 @@ def value_to_class(v):
         return [1, 0]
 
 
-def extract_labels(filename, num_images):
+def extract_labels(folderpath):
     """ (ETH) Extract the labels into a 1-hot matrix [image index, label index].
     
     Parameters
@@ -119,27 +102,14 @@ def extract_labels(filename, num_images):
         1-hot matrix [image index, label index]
     """
     gt_imgs = []
-    for i in range(1, 100 + 1):
-        imageid = "satImage_%.3d" % i
-        image_filename = filename + imageid + ".png"
-        if os.path.isfile(image_filename):
-            print('Loading ' + image_filename)
-            img = mpimg.imread(image_filename)
+    files = os.listdir(folderpath)
+    n = len(files)
+    for i in range(n):
+        img = mpimg.imread(folderpath+files[i])
+        try:
+            gt_imgs.append(img[:,:,0])
+        except:
             gt_imgs.append(img)
-
-        else:
-                print('File ' + image_filename + ' does not exist')
-
-        for j in range(16):
-            imageid = "satImage_%.3d" % i
-            imageid += '_Aug%.2d' % j
-            image_filename = filename + imageid + '.png'
-            if os.path.isfile(image_filename):
-                print('Loading ' + image_filename)
-                img = mpimg.imread(image_filename)
-                gt_imgs.append(img[:,:,0])
-            else:
-                print('File ' + image_filename + ' does not exist')
 
     num_images = len(gt_imgs)
     gt_patches = [img_crop(gt_imgs[i], cfg.IMG_PATCH_SIZE, cfg.IMG_PATCH_SIZE) for i in range(num_images)]
@@ -149,3 +119,110 @@ def extract_labels(filename, num_images):
     labels = labels.astype(np.float32)
     
     return labels
+
+
+def label_to_img(imgwidth, imgheight, w, h, labels):
+    ''' Convert array of labels to an image 
+    
+    parameter
+    ---------
+    imgwidth: int
+        Width of image
+    imgheight: int
+        Height of image
+    w: int
+        Width of patch
+    h: int
+        Height of patch
+    labels: ndarray
+        The labels
+        
+    returns
+    --------
+    array_labels: ndarray
+        Array of zeros and ones in image format'''
+
+    array_labels = np.zeros([imgwidth, imgheight])
+    idx = 0
+    for i in range(0, imgheight, h):
+        for j in range(0, imgwidth, w):
+            if labels[idx][0] > 0.5:  # bgrd
+                l = 0
+            else:
+                l = 1
+            array_labels[j:j+w, i:i+h] = l
+            idx = idx + 1
+    return array_labels
+
+
+def img_float_to_uint8(img):
+    '''converts image array with floats to uint8
+    
+    parameters
+    -----------
+    img: ndarray
+        image array
+    
+    returns
+    -------
+    rimg: ndarray
+        converted array'''
+
+    rimg = img - np.min(img)
+    rimg = (rimg / np.max(rimg) * cfg.PIXEL_DEPTH).round().astype(np.uint8)
+    return rimg
+
+def concatenate_images(img, gt_img):
+    '''Concatenate two images
+    
+    parameters
+    -----------
+    img: ndarray
+        image 1
+    gt_img: ndarray
+        image 2
+    
+    returns
+    --------
+    cimg: ndarray
+        concatenated image'''
+
+    n_channels = len(gt_img.shape)
+    w = gt_img.shape[0]
+    h = gt_img.shape[1]
+    if n_channels == 3:
+        cimg = np.concatenate((img, gt_img), axis=1)
+    else:
+        gt_img_3c = np.zeros((w, h, 3), dtype=np.uint8)
+        gt_img8 = img_float_to_uint8(gt_img)          
+        gt_img_3c[:, :, 0] = gt_img8
+        gt_img_3c[:, :, 1] = gt_img8
+        gt_img_3c[:, :, 2] = gt_img8
+        img8 = img_float_to_uint8(img)
+        cimg = np.concatenate((img8, gt_img_3c), axis=1)
+    return cimg
+
+def make_img_overlay(img, predicted_img):
+    '''Creates an image with predictions overlayed the groundtruth
+    
+    parameters
+    ------------
+    img: ndarray
+        groundtruth image
+    predicted_img: ndarray
+        predicted image
+    
+    returns
+    --------
+    new_img: ndarray
+        image with overlay'''
+    w = img.shape[0]
+    h = img.shape[1]
+    color_mask = np.zeros((w, h, 3), dtype=np.uint8)
+    color_mask[:, :, 0] = predicted_img*cfg.PIXEL_DEPTH
+
+    img8 = img_float_to_uint8(img)
+    background = Image.fromarray(img8, 'RGB').convert("RGBA")
+    overlay = Image.fromarray(color_mask, 'RGB').convert("RGBA")
+    new_img = Image.blend(background, overlay, 0.2)
+    return new_img
