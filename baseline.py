@@ -42,10 +42,10 @@ def main(argv=None):  # pylint: disable=unused-argument
     # Extract it into numpy arrays.
     # train_data here contains a list with standardized RGB values in the most inner array, 
     # inside patches of 16 pixels, inside array of all image pixels, inside array of all images
-    train_data = extract_data(train_data_filename, cfg.TRAINING_SIZE)
+    train_data = extract_data(train_data_filename)
 
     # The same yields for the labels
-    train_labels = extract_labels(train_labels_filename, cfg.TRAINING_SIZE)
+    train_labels = extract_labels(train_labels_filename)
 
     # Can be considered as an equivalent to iterations
     num_epochs = cfg.NUM_EPOCHS
@@ -70,7 +70,6 @@ def main(argv=None):  # pylint: disable=unused-argument
     train_labels = train_labels[new_indices]
 
     train_size = train_labels.shape[0]
-
     c0 = 0
     c1 = 0
     for i in range(len(train_labels)):
