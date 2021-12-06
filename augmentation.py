@@ -38,9 +38,9 @@ def random_crop(img, mask, min_size=100):
     return sliced_img, sliced_mask
 
 
-def rescale(img, mask, row_num=400, col_num=400):
+def rescale(img, mask, row_num=256, col_num=256):
     """
-    Rescales the image into size 400 x 400
+    Rescales the image into size 256 x 256
 
     Parameters
     ----------
@@ -68,7 +68,7 @@ def rescale(img, mask, row_num=400, col_num=400):
 
 def crop_and_rescale(img, mask):
     """
-    Makes a random crop and rescales the image back into size 400 x 400
+    Makes a random crop and rescales the image back into size 256 x 256
     
     Parameters
     ----------
@@ -93,7 +93,7 @@ def crop_and_rescale(img, mask):
 
 def rotate_and_rescale(img, mask):
     """
-    Makes a random rotation of the inputs, zooms in to crop out black fields after rotation and rescales the image back into size 400 x 400
+    Makes a random rotation of the inputs, zooms in to crop out black fields after rotation and rescales the image back into size 256 x 256
     
     Parameters
     ----------
@@ -253,7 +253,7 @@ def augment(img, mask, crop_num=4, rot_num=2, filter_num=1):
     return img_list, mask_list
 
 
-def augment_dir(dir_images, dir_masks):
+def augment_dir(dir_images, dir_masks, destination_dir_images, destination_dir_masks):
     """
     Goes through the two directories and creates a folder in each of the directories with the feature augmented data set. 
 
@@ -263,6 +263,10 @@ def augment_dir(dir_images, dir_masks):
         Directory of the satellite images
     dir_masks: str
         Directory of the corresponding ground truth images
+    destination_dir_images: str
+        Directory of where to store the augmented sattellite images
+    destination_dir_masks: str
+        Directory of where to store the corresponding augmented ground truths
     """
     # Load the images
     images = os.listdir(dir_images)
@@ -273,6 +277,22 @@ def augment_dir(dir_images, dir_masks):
         # Only load pictures
         if images[i][-3:] != "png" or masks[i][-3:] != "png":
             continue
+        
+        # Create folders to store augmentations
+        folders = ["90-split","10-split"]
+        for folder_name in folders:
+            if not os.path.exists(os.path.join(destination_dir_images, folder_name)):
+                os.makedirs(os.path.join(destination_dir_images, folder_name))
+            if not os.path.exists(os.path.join(destination_dir_masks, folder_name)):
+                os.makedirs(os.path.join(destination_dir_masks, folder_name))
+        
+        # store in 10-split folder if the picture is one of the last 10
+        id = int(images[i][-7:-4])
+        print(id)
+        if id > 90:
+            folder = folders[1]
+        else:
+            folder = folders[0]
 
         # Load the images
         img = cv2.imread(os.path.join(dir_images, images[i]))
@@ -283,15 +303,25 @@ def augment_dir(dir_images, dir_masks):
 
         # Save each augmentation
         for j in range(len(img_list)):
-
-            # Create folders to store augmentations
-            if not os.path.exists( os.path.join(dir_images, "images_aug")):
-                os.makedirs(os.path.join(dir_images, "images_aug"))
-            if not os.path.exists( os.path.join(dir_masks, "groundtruth_aug")):
-                os.makedirs(os.path.join(dir_masks, "groundtruth_aug"))
            
             # Create filenames and save
-            img_filename = os.path.join(dir_images, "images_aug" , images[i])[0:-4] + f"_Aug{str(j).zfill(2)}" + ".png"
-            mask_filename = os.path.join(dir_masks, "groundtruth_aug" ,masks[i])[0:-4] + f"_Aug{str(j).zfill(2)}" + ".png"
+            img_filename = os.path.join(destination_dir_images, folder, images[i])[0:-4] + f"_Aug{str(j).zfill(2)}" + ".png"
+            mask_filename = os.path.join(destination_dir_masks, folder, masks[i])[0:-4] + f"_Aug{str(j).zfill(2)}" + ".png"
             cv2.imwrite(img_filename, img_list[j])
             cv2.imwrite(mask_filename, mask_list[j])
+        
+        # Save original resized picture 
+        img_filename = os.path.join(destination_dir_images, folder, images[i])
+        mask_filename = os.path.join(destination_dir_masks, folder, masks[i])
+        img_rescaled, mask_rescaled = rescale(img, mask, row_num=256, col_num=256)
+        cv2.imwrite(img_filename, img_rescaled)
+        cv2.imwrite(mask_filename, mask_rescaled)
+
+if __name__ == "__main__":
+    dir_images = "/Users/nikolaibeckjensen/Desktop/training/images" 
+    dir_masks = "/Users/nikolaibeckjensen/Desktop/training/groundtruth"
+    destination_dir_images = "/Users/nikolaibeckjensen/Desktop/ml-project-2-vikings_ml/data/training/images"
+    destination_dir_masks = "/Users/nikolaibeckjensen/Desktop/ml-project-2-vikings_ml/data/training/groundtruth"
+    
+    augment_dir(dir_images, dir_masks, destination_dir_images, destination_dir_masks)
+    
