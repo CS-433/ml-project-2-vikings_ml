@@ -203,7 +203,7 @@ def filter_color_and_blur(img):
     return img
 
 
-def augment(img, mask, crop_num=4, rot_num=2, filter_num=1):
+def augment(img, mask, crop_num=4, rot_num=3, filter_num=1):
     """
     Given image and corresponding mask, creates crop_num * rot_num * (filter_num + 1) augmentations
 
@@ -244,9 +244,12 @@ def augment(img, mask, crop_num=4, rot_num=2, filter_num=1):
             img_list.append(filter_color_and_blur(img_crop))
             mask_list.append(mask_crop)
 
-        # Rotate each picture a given number of times
+    assert len(img_list) == 8
+    # Rotate each picture a given number of times
+    img_list_len = len(img_list)
+    for k in range(img_list_len):
         for j in range(rot_num):
-            img_rot, mask_rot = rotate_and_rescale(img, mask)
+            img_rot, mask_rot = rotate_and_rescale(img_list[k], mask_list[k])
             img_list.append(img_rot)
             mask_list.append(mask_rot)
         
@@ -320,8 +323,8 @@ def augment_dir(dir_images, dir_masks, destination_dir_images, destination_dir_m
 if __name__ == "__main__":
     dir_images = "/Users/nikolaibeckjensen/Desktop/training/images" 
     dir_masks = "/Users/nikolaibeckjensen/Desktop/training/groundtruth"
-    destination_dir_images = "/Users/nikolaibeckjensen/Desktop/ml-project-2-vikings_ml/data/training/images"
-    destination_dir_masks = "/Users/nikolaibeckjensen/Desktop/ml-project-2-vikings_ml/data/training/groundtruth"
+    destination_dir_images = "/Users/nikolaibeckjensen/Desktop/ml-project-2-vikings_ml/data/training_double/images"
+    destination_dir_masks = "/Users/nikolaibeckjensen/Desktop/ml-project-2-vikings_ml/data/training_double/groundtruth"
     
     augment_dir(dir_images, dir_masks, destination_dir_images, destination_dir_masks)
     
