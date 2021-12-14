@@ -1,0 +1,18 @@
+•	Baseline logreg/SVm
+•	Baseline CNN, the one made by the course
+•	Then we did augmentation
+•	Improvements to the baseline CNN(maybe also log reg)
+•	U-Net, implemented ourselves
+•	Then we figured easy to use existing architecture through segmentation models library
+•	REFLECT: The way we used to test the model. Data leakage. Did rather do a 90/10 split which gave good generalization error
+•	Then we got good predictions
+•	Then we invented a window technique for predictions, very good results
+•	We saw the model overfitting, did therefore include weight regularization
+•	Then we found did ensembles by more than n votes, tested all combinations, found out that 4 was best
+
+•	And we tried logreg and svm, did not work as well as we hoped, did not prioritize improving it
+•	Did also try some different version of the window technique, did not work
+•	We also tried RCF, did not work at all
+•	Tried using a ladder net
+•	We tried doubling the number of augmentations, did worsen our predictions
+•	Did not try different learning rates, did not try different sizes of the windows. Did not try dropout. Takes so long to train, needed to prioritize what we felt had the most impact. Did therefore leave these out. Left as an exercise to the reader😊
