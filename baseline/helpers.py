@@ -50,7 +50,6 @@ def extract_features(img):
 
 
 def extract_features_2d(img):
-    """ Docstring """
     feat_m = np.mean(img)
     feat_v = np.var(img)
     feat = np.append(feat_m, feat_v)
