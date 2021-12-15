@@ -1,4 +1,4 @@
-•	Baseline logreg/SVm
+•	Baseline logreg/SVM
 •	Baseline CNN, the one made by the course
 •	Then we did augmentation
 •	Improvements to the baseline CNN(maybe also log reg)
