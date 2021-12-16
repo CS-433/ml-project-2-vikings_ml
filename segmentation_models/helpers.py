@@ -74,3 +74,44 @@ def window_predict(img):
     pred = np.vstack([np.vstack([top, middle]), bottom])
     
     return pred
+
+
+def save_predictions(img, name):
+  '''
+  Saves an image
+  
+  parameters
+  -----------
+  img: ndarray
+    The image that should be saved
+  name: string
+    The filename for the image
+  '''
+  # converting the image from one to three channels
+  w = img.shape[0]
+  h = img.shape[1]
+  gt_img_3c = np.zeros((w, h, 3), dtype=np.uint8)
+  gt_img8 = img_float_to_uint8(img)          
+  gt_img_3c[:, :, 0] = gt_img8[:,:,0]
+  gt_img_3c[:, :, 1] = gt_img8[:,:,0]
+  gt_img_3c[:, :, 2] = gt_img8[:,:,0]
+
+  # saving the image
+  cv2.imwrite('/content/drive/MyDrive/ml/%s.png'%(name), gt_img_3c)
+
+def img_float_to_uint8(img):
+    '''converts image array with floats to uint8
+    
+    parameters
+    -----------
+    img: ndarray
+        image array
+    
+    returns
+    -------
+    rimg: ndarray
+        converted array'''
+
+    rimg = img - np.min(img)
+    rimg = (rimg / np.max(rimg) * 255).round().astype(np.uint8)
+    return rimg

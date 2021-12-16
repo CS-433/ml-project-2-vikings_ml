@@ -1,3 +1,7 @@
+import numpy as np
+import os
+import matplotlib.image as mpimg
+
 def extract_data(folderpath):
     """ (ETH) Extract the images into a 4D tensor [image index, y, x, channels].
     Values are rescaled from [0, 255] down to [-0.5, 0.5].
