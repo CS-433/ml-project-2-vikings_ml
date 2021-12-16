@@ -107,7 +107,19 @@ def save_predictions(img, name):
   cv2.imwrite('/content/drive/MyDrive/ml/%s.png'%(name), gt_img_3c)
 
 def mask_to_submission_strings(image_filename, thr):
-    """Reads a single image and outputs the strings that should go into the submission file"""
+    """Reads a single image and outputs the strings that should go into the submission file
+    
+    parameters
+    ------------
+    image_filename: string
+      The image filename
+    thr: float
+      The threshold for converting a patch to label
+    
+    yields
+    --------
+    A formatted prediction string
+    """
     img_number = int(re.search(r"\d+", image_filename).group(0))
     im = mpimg.imread(image_filename)
     patch_size = 16
@@ -119,7 +131,17 @@ def mask_to_submission_strings(image_filename, thr):
 
 
 def masks_to_submission(submission_filename, thr, *image_filenames):
-    """Converts images into a submission file"""
+    """Converts images into a submission file
+    
+    parameters
+    ------------
+    submission_filename: string
+      the name of the submission file
+    thr: float
+      The threshold for converting a patch to label
+    *image_filenames: list
+      list of the image filnames that should be included in the prediction
+    """
     with open(submission_filename, 'w') as f:
         f.write('id,prediction\n')
         for fn in image_filenames[0:]:
