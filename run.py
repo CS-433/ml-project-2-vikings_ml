@@ -12,34 +12,44 @@ sm.set_framework('tf.keras')
 from seg_mod_unet.data_handling import extract_data, extract_data_test, extract_labels
 from seg_mod_unet.helpers import window_predict, save_predictions, masks_to_submission
 
-# filepath test images
-test_images_path = '/content/testing'
 
-# defining backbone for the model
-BACKBONE = 'resnet34'
-# downloading preprocessing function for the model
-preprocess_input = sm.get_preprocessing(BACKBONE)
+# data paths
+test_images_path = '/content/testing'
+train_data_path = '/content/drive/MyDrive/ml/training/images/'
+train_labels_path = '/content/drive/MyDrive/ml/training/groundtruth/'
+
+# model paths
+m1_path = '/content/drive/MyDrive/ml/m1.h'
+m2_path = '/content/drive/MyDrive/ml/m2.h'
+m3_path = '/content/drive/MyDrive/ml/m3.h'
+m4_path = '/content/drive/MyDrive/ml/m4.h'
+m5_path = '/content/drive/MyDrive/ml/m5.h'
 
 # defining if model should be trained or not
 TRAIN = False
 
-# defining threhshold
-foreground_threshold = 0.04
+# defining backbone for the model
+BACKBONE = 'resnet34'
 
-# Defining paths to images and masks
-train_data_path = '/content/drive/MyDrive/ml/training/images/'
-train_labels_path = '/content/drive/MyDrive/ml/training/groundtruth/'
+# downloading preprocessing function for the model
+preprocess_input = sm.get_preprocessing(BACKBONE)
 
-# model filepaths
-model_1 = '/content/drive/MyDrive/ml/m1.h'
-model_2 = '/content/drive/MyDrive/ml/m2.h'
-model_3 = '/content/drive/MyDrive/ml/m3.h'
-model_4 = '/content/drive/MyDrive/ml/m4.h'
-model_5 = '/content/drive/MyDrive/ml/m5.h'
+#defining loss, regularizer and optimizer for the model
+optimizer = 'Adam'
+kernel_regularizer = keras.regularizers.l2(1)
+loss = sm.losses.bce_jaccard_loss
+
+# defining number of epochs and batch size
+num_epcohs = 50
+batch_size = 32
 
 # custom objects for the model
-custom_objects = {'binary_crossentropy_plus_jaccard_loss':sm.losses.bce_jaccard_loss, 
+custom_objects = {'binary_crossentropy_plus_jaccard_loss':loss, 
                       'iou_score': sm.metrics.iou_score, 'f1-score': sm.metrics.FScore()}
+                      
+# defining threhshold for attributing patch as road
+foreground_threshold = 0.04
+
 
 def main():
     if TRAIN:
@@ -68,12 +78,12 @@ def main():
             model = sm.Unet(BACKBONE, encoder_weights='imagenet', input_shape=(256, 256, 3))
 
             # adding  L2 kernel regularizer
-            sm.utils.set_regularization(model, kernel_regularizer=keras.regularizers.l2(1))
+            sm.utils.set_regularization(model, kernel_regularizer=kernel_regularizer)
 
             # compiling the model using Adam optimizer and Binary Cross Entropy with Jaccard loss
             model.compile(
-                'Adam',
-                loss=sm.losses.bce_jaccard_loss,
+                optimizer,
+                loss=loss,
                 metrics=[sm.metrics.iou_score, sm.metrics.FScore(),'accuracy'],
             )
 
@@ -82,7 +92,7 @@ def main():
 
             # training the model for 50 epochs with batch size = 32
             history = model.fit(x=x_train, y=y_train,
-            epochs=50, batch_size=32,
+            epochs=num_epochs, batch_size=batch_size,
             callbacks=callbacks,
             validation_data=(x_val,y_val)
             )
@@ -90,11 +100,11 @@ def main():
 
 
     # loading models
-    m1 = load_model(model_1, custom_objects=custom_objects)
-    m2 = load_model(model_2, custom_objects=custom_objects)
-    m3 = load_model(model_3, custom_objects=custom_objects)
-    m4 = load_model(model_4, custom_objects=custom_objects)
-    m5 = load_model(model_5, custom_objects=custom_objects)
+    m1 = load_model(m1_path, custom_objects=custom_objects)
+    m2 = load_model(m2_path, custom_objects=custom_objects)
+    m3 = load_model(m3_path, custom_objects=custom_objects)
+    m4 = load_model(m4_path, custom_objects=custom_objects)
+    m5 = load_model(m5_path, custom_objects=custom_objects)
 
     models = [m1, m2, m3, m4, m5]
 
