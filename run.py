@@ -36,6 +36,7 @@ preprocess_input = sm.get_preprocessing(BACKBONE)
 
 # defining if model should be trained or not
 TRAIN = False
+
 # defining threhshold
 foreground_threshold = 0.04
 
