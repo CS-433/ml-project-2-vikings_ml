@@ -1,3 +1,8 @@
+import numpy as np
+import cv2
+import re
+import matplotlib.image as mpimg
+
 def patch_to_label(patch, thr):
   '''
   Converting a patch to road if the average pixel value in the patch is larger than the threshold
@@ -21,7 +26,7 @@ def patch_to_label(patch, thr):
   
   return value
 
-def window_predict(img):
+def window_predict(img, model):
     '''
     Predicts segmenation on an image using the window method, i.e. predicting on 256x256 crops of the image.
     
@@ -29,6 +34,8 @@ def window_predict(img):
     ------------
     img: ndarray
         An image that should be segmented
+    model: Keras model
+      The model that should make predictions
     
     returns
     ------------
@@ -46,7 +53,7 @@ def window_predict(img):
     img8 = img[352:608,256:512,:]
     img9 = img[352:608,352:608,:]
 
-    # predictiong on each of the cropped images
+    # predicting on each of the cropped images
     pred_1 = model.predict(np.expand_dims(img1, axis=0))[0]
     pred_2 = model.predict(np.expand_dims(img2, axis=0))[0]
     pred_3 = model.predict(np.expand_dims(img3, axis=0))[0]
@@ -98,6 +105,25 @@ def save_predictions(img, name):
 
   # saving the image
   cv2.imwrite('/content/drive/MyDrive/ml/%s.png'%(name), gt_img_3c)
+
+def mask_to_submission_strings(image_filename, thr):
+    """Reads a single image and outputs the strings that should go into the submission file"""
+    img_number = int(re.search(r"\d+", image_filename).group(0))
+    im = mpimg.imread(image_filename)
+    patch_size = 16
+    for j in range(0, im.shape[1], patch_size):
+        for i in range(0, im.shape[0], patch_size):
+            patch = im[i:i + patch_size, j:j + patch_size]
+            label = patch_to_label(patch, thr)
+            yield("{:03d}_{}_{},{}".format(img_number, j, i, label))
+
+
+def masks_to_submission(submission_filename, thr, *image_filenames):
+    """Converts images into a submission file"""
+    with open(submission_filename, 'w') as f:
+        f.write('id,prediction\n')
+        for fn in image_filenames[0:]:
+            f.writelines('{}\n'.format(s) for s in mask_to_submission_strings(fn, thr))
 
 def img_float_to_uint8(img):
     '''converts image array with floats to uint8
