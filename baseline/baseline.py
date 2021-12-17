@@ -25,8 +25,9 @@ TRAINING_SIZE = 1700
 VALIDATION_SIZE = 5  # Size of the validation set.
 SEED = 66478  # Set to None for random seed.
 BATCH_SIZE = 64
-NUM_EPOCHS = 100    
-RESTORE_MODEL  = True  # If True, restore existing model instead of training a new one
+NUM_EPOCHS = 30    
+RESTORE_MODEL = False  # If True, restore existing model instead of training a new one
+AUG = sys.argv[1]
 RECORDING_STEP = 0
 
 # Set image patch size in pixels
@@ -65,10 +66,16 @@ def main(argv=None):  # pylint: disable=unused-argument
     tf.compat.v1.disable_eager_execution()
 
     #defining paths to data
-    data_dir = os.path.join(os.path.join(str(Path.cwd()), 'data'), 'training')
-    train_data_filename = os.path.join(os.path.join(data_dir, 'images'),'90-split')
-    train_labels_filename = os.path.join(os.path.join(data_dir, 'groundtruth'), '90-split') 
-
+    if AUG:
+        data_dir = os.path.join(os.path.join(str(Path.cwd()), 'data'), 'training')
+        train_data_filename = os.path.join(os.path.join(data_dir, 'images'),'90-split')
+        train_labels_filename = os.path.join(os.path.join(data_dir, 'groundtruth'), '90-split') 
+    else:
+        data_dir = os.path.join(os.path.join(str(Path.cwd()), 'data'), 'original')
+        train_data_filename = os.path.join(data_dir, 'images')
+        train_labels_filename = os.path.join(data_dir, 'groundtruth') 
+    print(sys.argv[1])
+    print(AUG)
     # Extract it into numpy arrays.
     # train_data here contains a list with standardized RGB values in the most inner array, 
     # inside patches of 16 pixels, inside array of all image pixels, inside array of all images
@@ -348,7 +355,7 @@ def main(argv=None):  # pylint: disable=unused-argument
                 # Save the variables to disk.
                 save_path = saver.save(s, FLAGS.train_dir + "/model.ckpt")
                 print("Model saved in file: %s" % save_path)
-
+        """
         print("Running prediction on training set")
         prediction_training_dir = "predictions_training/"
         if not os.path.isdir(prediction_training_dir):
@@ -359,13 +366,16 @@ def main(argv=None):  # pylint: disable=unused-argument
             Image.fromarray(pimg).save(prediction_training_dir + "prediction_" + str(i) + ".png")
             oimg = get_prediction_with_overlay(train_data_filename, i)
             oimg.save(prediction_training_dir + "overlay_" + str(i) + ".png") 
-        
-        print('Predicting on testset')
+        """
+        #print('Predicting on testing set')
 
         testing_dir = os.path.join(os.path.join(str(Path.cwd()), 'data'), 'testing') #path for test images
+        val_dir = os.path.join(os.path.join(str(Path.cwd()), 'data'), 'training') #path for test images
+        val_dir = os.path.join(os.path.join(val_dir, 'images'), '10-split')
         test_images = os.path.join(str(Path.cwd()), 'predictions')  #path to save test predictions
 
         # creating test predictions
+        """
         for i in range(1,51):
             print('predicting image %d'%i)
             imgpath = os.path.join(testing_dir, 'test_%d.png'%i) 
@@ -386,14 +396,35 @@ def main(argv=None):  # pylint: disable=unused-argument
             img = Image.fromarray(gt_img_3c)
             #saving the prediction image
             img.save(os.path.join(test_images, '%d.png'%i))
-            """
+            
             #saving predictions with overlay over groundtruth
             img = mpimg.imread(imgpath)
             img_prediction = get_prediction(img)
             oimg = make_img_overlay(img, img_prediction)
             oimg.save(test_images + 'overlay_'+str(i)+'.png')
-            """
-            
+        
+        """
+        print('Predicting on validation set')
+        files = os.listdir(val_dir)
+        print("Predicting on %d images"%len(files))
+        i=1
+        for file in files:
+            pimg = get_prediction(mpimg.imread(os.path.join(val_dir, file)))
+
+            #converting prediction such that it can be visualized
+            w = pimg.shape[0]
+            h = pimg.shape[1]
+            gt_img_3c = numpy.zeros((w, h, 3), dtype=numpy.uint8)
+            gt_img8 = img_float_to_uint8(pimg)          
+            gt_img_3c[:, :, 0] = gt_img8
+            gt_img_3c[:, :, 1] = gt_img8
+            gt_img_3c[:, :, 2] = gt_img8
+
+            #creating image from array for viz purposes
+            img = Image.fromarray(gt_img_3c)
+            #saving the prediction image
+            img.save(os.path.join(test_images, '%d.png'%i))
+            i+=1
 
 
 #%%
