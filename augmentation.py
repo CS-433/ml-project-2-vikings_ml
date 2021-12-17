@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 import os
 import cv2
 
+#TODO: Remove resizing and only crop 256x256 images. I did this myself for the final prediction you see
+
 def random_crop(img, mask, min_size=100):
     """
     Crops a random subset of the picture with a standard minimum size of 80 x 80 pixels
@@ -320,6 +322,7 @@ def augment_dir(dir_images, dir_masks, destination_dir_images, destination_dir_m
         cv2.imwrite(img_filename, img_rescaled)
         cv2.imwrite(mask_filename, mask_rescaled)
 
+#TODO: Filepaths
 if __name__ == "__main__":
     dir_images = "/Users/nikolaibeckjensen/Desktop/training/images" 
     dir_masks = "/Users/nikolaibeckjensen/Desktop/training/groundtruth"
