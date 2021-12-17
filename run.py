@@ -1,5 +1,6 @@
 'This file contains the ensemble model that gave the best score on AICrowd with a F1-score of 0.901'
 #TODO: Set optimal threshold?
+#TODO: Test code
 
 # imports
 import numpy as np
@@ -20,13 +21,14 @@ train_data_path = os.path.join(train_path, 'images')
 train_labels_path = os.path.join(train_path, 'groundtruth')
 test_images_path = os.path.join(data_path, 'testing')
 
+#TODO: How to store models?
 # model paths
 model_folder = os.path.join(str(Path.cwd()), 'models')
-m1_path = '/content/drive/MyDrive/ml/m1.h'
-m2_path = '/content/drive/MyDrive/ml/m2.h'
-m3_path = '/content/drive/MyDrive/ml/m3.h'
-m4_path = '/content/drive/MyDrive/ml/m4.h'
-m5_path = '/content/drive/MyDrive/ml/m5.h'
+m1_path = os.path.join(model_folder, 'm1.h')
+m2_path = os.path.join(model_folder, 'm2.h')
+m3_path = os.path.join(model_folder, 'm3.h')
+m4_path = os.path.join(model_folder, 'm4.h')
+m5_path = os.path.join(model_folder, 'm5.h')
 
 # filepaths to the five models' predictions on the test set
 X1 = 'predictions/m1_pred.csv'
