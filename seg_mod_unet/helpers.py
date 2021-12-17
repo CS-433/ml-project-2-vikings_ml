@@ -104,7 +104,7 @@ def save_predictions(img, name):
   gt_img_3c[:, :, 2] = gt_img8[:,:,0]
 
   # saving the image
-  cv2.imwrite('/content/drive/MyDrive/ml/%s.png'%(name), gt_img_3c)
+  cv2.imwrite('predictions/%s.png'%(name), gt_img_3c)
 
 def mask_to_submission_strings(image_filename, thr):
     """Reads a single image and outputs the strings that should go into the submission file

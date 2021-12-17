@@ -1,5 +1,4 @@
 'This file contains the ensemble model that gave the best score on AICrowd with a F1-score of 0.901'
-#TODO: fix filepaths
 #TODO: Set optimal threshold?
 
 # imports
@@ -11,19 +10,30 @@ import segmentation_models as sm
 sm.set_framework('tf.keras')
 from seg_mod_unet.data_handling import extract_data, extract_data_test, extract_labels
 from seg_mod_unet.helpers import window_predict, save_predictions, masks_to_submission
-
+from pathlib import Path
+import os
 
 # data paths
-test_images_path = '/content/testing'
-train_data_path = '/content/drive/MyDrive/ml/training/images/'
-train_labels_path = '/content/drive/MyDrive/ml/training/groundtruth/'
+data_path = os.path.join(str(Path.cwd()), 'data')
+train_path = os.path.join(data_path, 'training')
+train_data_path = os.path.join(train_path, 'images')
+train_labels_path = os.path.join(train_path, 'groundtruth')
+test_images_path = os.path.join(data_path, 'testing')
 
 # model paths
+model_folder = os.path.join(str(Path.cwd()), 'models')
 m1_path = '/content/drive/MyDrive/ml/m1.h'
 m2_path = '/content/drive/MyDrive/ml/m2.h'
 m3_path = '/content/drive/MyDrive/ml/m3.h'
 m4_path = '/content/drive/MyDrive/ml/m4.h'
 m5_path = '/content/drive/MyDrive/ml/m5.h'
+
+# filepaths to the five models' predictions on the test set
+X1 = 'predictions/m1_pred.csv'
+X2 = 'predictions/m2_pred.csv'
+X3 = 'predictions/m3_pred.csv'
+X4 = 'predictions/m4_pred.csv'
+X5 = 'predictions/m5_pred.csv'
 
 # defining if model should be trained or not
 TRAIN = False
@@ -88,7 +98,7 @@ def main():
             )
 
             # saving the model thats scores best on the validation data
-            callbacks = [keras.callbacks.ModelCheckpoint("/content/drive/MyDrive/ml/m%d.h5" % (i+1), save_best_only=True)]
+            callbacks = [keras.callbacks.ModelCheckpoint(os.path.join(model_folder, "m%d.h5") % (i+1), save_best_only=True)]
 
             # training the model for 50 epochs with batch size = 32
             history = model.fit(x=x_train, y=y_train,
@@ -109,7 +119,7 @@ def main():
     models = [m1, m2, m3, m4, m5]
 
     # loading test images
-    test_images = extract_data_test('/content/testing/')
+    test_images = extract_data_test(test_images_path)
 
     #preprocessing test images
     test_images = preprocess_input(test_images)
@@ -125,25 +135,14 @@ def main():
             save_predictions(img, 'test%d'%i)
 
         # generating the prediction file for the test set
-        submission_filename = '/content/drive/MyDrive/ml/m%d_pred.csv' % (i+1)
+        submission_filename = 'predictions/m%d_pred.csv' % (i+1)
         image_filenames = []
         for j in range(1, 51):
-            image_filename = '/content/drive/MyDrive/ml/test%d.png' % j
+            image_filename = 'predictions/test%d.png' % j
             image_filenames.append(image_filename)
         masks_to_submission(submission_filename, foreground_threshold, *image_filenames)
 
-
-
-
-
-    # ensemble model below
-
-    # filepaths to the five models' predictions on the test set
-    X1 = '/content/drive/MyDrive/ml/m1_pred.csv'
-    X2 = '/content/drive/MyDrive/ml/m2_pred.csv'
-    X3 = '/content/drive/MyDrive/ml/m3_pred.csv'
-    X4 = '/content/drive/MyDrive/ml/m4_pred.csv'
-    X5 = '/content/drive/MyDrive/ml/m5_pred.csv'
+    " Making ensemble model predictions "
 
     # reading the models' prediction into five dataframes
 
@@ -180,7 +179,7 @@ def main():
     df = df['prediction']
 
     # writing predctions to csv
-    df.to_csv('predictions.csv')
+    df.to_csv('predctions/ensemble.csv')
 
 
 if __name__ == "__main__":
