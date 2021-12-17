@@ -1,16 +1,6 @@
 # ml-project-2-vikings_ml
-The project should be structured as the following picture (ish):
 
-![bestPractice](https://user-images.githubusercontent.com/91196447/142685404-725bcd17-0b66-4258-931c-9380104867b0.png)
+This repository contains our contributions for the AICrowd challenge Road Segmenation: https://www.aicrowd.com/challenges/epfl-ml-road-segmentation, hosted by MLO EPFL as a part of the course CS-433 Machine Learning. The best submission achieved a F1-score of 0.901 and can be found here: https://www.aicrowd.com/challenges/epfl-ml-road-segmentation/submissions/167620. 
 
-__data__ - Self explanatory
+The repository is structured as follows:
 
-__predictions__ - Containing predicted images and submission files
-
-__models__ - Containing saved models to avoid retraining
-
-__src__ - containing all code and functions
-
-__ModelStatistics.xlsx__ - Excel sheet with information on every trained model to enable reproducibility
-
-__notebooks__ Notebooks for playing around
