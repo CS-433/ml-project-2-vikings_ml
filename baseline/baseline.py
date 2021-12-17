@@ -6,23 +6,33 @@ Credits: Aurelien Lucchi, ETH Zürich
 
 Code updated to be compatible with TensorFlow 2.x
 """
-import gzip
+
 import os
 from re import A
 import sys
-import urllib
 import matplotlib.image as mpimg
 from PIL import Image
-from src.helpers.handling_images import img_crop, extract_data, extract_labels, label_to_img, make_img_overlay, concatenate_images, img_float_to_uint8
-import config as cfg
-from src.helpers.helpers import error_rate
-
-import code
-
-import tensorflow.python.platform
-
+from handling_images import img_crop, extract_data, extract_labels, label_to_img, make_img_overlay, concatenate_images, img_float_to_uint8
 import numpy
 import tensorflow as tf
+from pathlib import Path
+
+
+NUM_CHANNELS = 3  # RGB images
+PIXEL_DEPTH = 255
+NUM_LABELS = 2
+TRAINING_SIZE = 1700
+VALIDATION_SIZE = 5  # Size of the validation set.
+SEED = 66478  # Set to None for random seed.
+BATCH_SIZE = 64
+NUM_EPOCHS = 100    
+RESTORE_MODEL  = True  # If True, restore existing model instead of training a new one
+RECORDING_STEP = 0
+
+# Set image patch size in pixels
+# IMG_PATCH_SIZE should be a multiple of 4
+# image size should be an integer multiple of this number!
+IMG_PATCH_SIZE = 16
 
 
 tf.compat.v1.app.flags.DEFINE_string('train_dir', '/tmp/segment_aerial_images',
@@ -30,14 +40,34 @@ tf.compat.v1.app.flags.DEFINE_string('train_dir', '/tmp/segment_aerial_images',
                            """and checkpoint.""")
 FLAGS = tf.compat.v1.app.flags.FLAGS
 
+def error_rate(predictions, labels):
+    """(ETH) Return the error rate based on dense predictions and 1-hot labels.
+    
+    Parameters
+    ----------
+    predictions: ndarray
+        Numpy array with predictions
+    labels: ndarray
+        Numpy array with true labels
+    
+    returns
+    The error rate
+    """
+    return 100.0 - (
+        100.0 *
+        numpy.sum(numpy.argmax(predictions, 1) == numpy.argmax(labels, 1)) /
+        predictions.shape[0])
+
 
 def main(argv=None):  # pylint: disable=unused-argument
 
     # Added to be able to run as Tensorflow 2
     tf.compat.v1.disable_eager_execution()
-    data_dir = 'data/training/'
-    train_data_filename = data_dir + 'images/'
-    train_labels_filename = data_dir + 'groundtruth/' 
+
+    #defining paths to data
+    data_dir = os.path.join(os.path.join(str(Path.cwd()), 'data'), 'training')
+    train_data_filename = os.path.join(os.path.join(data_dir, 'images'),'90-split')
+    train_labels_filename = os.path.join(os.path.join(data_dir, 'groundtruth'), '90-split') 
 
     # Extract it into numpy arrays.
     # train_data here contains a list with standardized RGB values in the most inner array, 
@@ -48,7 +78,7 @@ def main(argv=None):  # pylint: disable=unused-argument
     train_labels = extract_labels(train_labels_filename)
 
     # Can be considered as an equivalent to iterations
-    num_epochs = cfg.NUM_EPOCHS
+    num_epochs = NUM_EPOCHS
 
     c0 = 0  # bgrd
     c1 = 0  # road
@@ -84,50 +114,50 @@ def main(argv=None):  # pylint: disable=unused-argument
     # training step using the {feed_dict} argument to the Run() call below.
     train_data_node = tf.compat.v1.placeholder(
         tf.float32,
-        shape=(cfg.BATCH_SIZE, cfg.IMG_PATCH_SIZE, cfg.IMG_PATCH_SIZE, cfg.NUM_CHANNELS))
+        shape=(BATCH_SIZE, IMG_PATCH_SIZE, IMG_PATCH_SIZE, NUM_CHANNELS))
     train_labels_node = tf.compat.v1.placeholder(tf.float32,
-                                       shape=(cfg.BATCH_SIZE, cfg.NUM_LABELS))
+                                       shape=(BATCH_SIZE, NUM_LABELS))
     train_all_data_node = tf.constant(train_data)
 
     # The variables below hold all the trainable weights. They are passed an
     # initial value which will be assigned when when we call:
     # {tf.initialize_all_variables().run()}
     conv1_weights = tf.Variable(
-        tf.random.truncated_normal([5, 5, cfg.NUM_CHANNELS, 32],  # 5x5 filter, depth 32.
+        tf.random.truncated_normal([5, 5, NUM_CHANNELS, 32],  # 5x5 filter, depth 32.
                             stddev=0.1,
-                            seed=cfg.SEED))
+                            seed=SEED))
     conv1_biases = tf.Variable(tf.zeros([32]))
     conv2_weights = tf.Variable(
         tf.random.truncated_normal([5, 5, 32, 64],
                             stddev=0.1,
-                            seed=cfg.SEED))
+                            seed=SEED))
     conv2_biases = tf.Variable(tf.constant(0.1, shape=[64]))
     fc1_weights = tf.Variable(  # fully connected, depth 512.
-        tf.random.truncated_normal([int(cfg.IMG_PATCH_SIZE / 4 * cfg.IMG_PATCH_SIZE / 4 * 64), 512],
+        tf.random.truncated_normal([int(IMG_PATCH_SIZE / 4 * IMG_PATCH_SIZE / 4 * 64), 512],
                             stddev=0.1,
-                            seed=cfg.SEED))
+                            seed=SEED))
     fc1_biases = tf.Variable(tf.constant(0.1, shape=[512]))
     fc2_weights = tf.Variable(
-        tf.random.truncated_normal([512, cfg.NUM_LABELS],
+        tf.random.truncated_normal([512, NUM_LABELS],
                             stddev=0.1,
-                            seed=cfg.SEED))
-    fc2_biases = tf.Variable(tf.constant(0.1, shape=[cfg.NUM_LABELS]))
+                            seed=SEED))
+    fc2_biases = tf.Variable(tf.constant(0.1, shape=[NUM_LABELS]))
 
     # Get prediction for given input image 
     def get_prediction(img):
-        data = numpy.asarray(img_crop(img, cfg.IMG_PATCH_SIZE, cfg.IMG_PATCH_SIZE))
+        data = numpy.asarray(img_crop(img, IMG_PATCH_SIZE, IMG_PATCH_SIZE))
         data_node = tf.constant(data)
         output = tf.nn.softmax(model(data_node))
         output_prediction = s.run(output)
-        img_prediction = label_to_img(img.shape[0], img.shape[1], cfg.IMG_PATCH_SIZE, cfg.IMG_PATCH_SIZE, output_prediction)
+        img_prediction = label_to_img(img.shape[0], img.shape[1], IMG_PATCH_SIZE, IMG_PATCH_SIZE, output_prediction)
 
         return img_prediction
 
     # Get a concatenation of the prediction and groundtruth for given input file
     def get_prediction_with_groundtruth(filename, image_idx):
 
-        imageid = "satImage_%.3d" % image_idx
-        image_filename = filename + imageid + ".png"
+        imageid = "satImage_%.3d.png" % image_idx
+        image_filename = os.path.join(filename, imageid)
         img = mpimg.imread(image_filename)
 
         img_prediction = get_prediction(img)
@@ -138,8 +168,8 @@ def main(argv=None):  # pylint: disable=unused-argument
     # Get prediction overlaid on the original image for given input file
     def get_prediction_with_overlay(filename, image_idx):
 
-        imageid = "satImage_%.3d" % image_idx
-        image_filename = filename + imageid + ".png"
+        imageid = "satImage_%.3d.png" % image_idx
+        image_filename = os.path.join(filename, imageid)
         img = mpimg.imread(image_filename)
 
         img_prediction = get_prediction(img)
@@ -196,7 +226,7 @@ def main(argv=None):  # pylint: disable=unused-argument
         # Add a 50% dropout during training only. Dropout also scales
         # activations such that no rescaling is needed at evaluation time.
         if train:
-            hidden = tf.nn.dropout(hidden, 0.5, seed=cfg.SEED)
+            hidden = tf.nn.dropout(hidden, 0.5, seed=SEED)
         out = tf.matmul(hidden, fc2_weights) + fc2_biases
 
         return out
@@ -232,7 +262,7 @@ def main(argv=None):  # pylint: disable=unused-argument
     # Decay once per epoch, using an exponential schedule starting at 0.01.
     learning_rate = tf.compat.v1.train.exponential_decay(
         0.01,                # Base learning rate.
-        batch * cfg.BATCH_SIZE,  # Current index into the dataset.
+        batch * BATCH_SIZE,  # Current index into the dataset.
         train_size,          # Decay step.
         0.95,                # Decay rate.
         staircase=True)
@@ -255,7 +285,7 @@ def main(argv=None):  # pylint: disable=unused-argument
     # Create a local session to run this computation.
     with tf.compat.v1.Session() as s:
 
-        if cfg.RESTORE_MODEL:
+        if RESTORE_MODEL:
             # Restore variables from disk.
             saver.restore(s, FLAGS.train_dir + "/model.ckpt")
             print("Model restored.")
@@ -271,7 +301,7 @@ def main(argv=None):  # pylint: disable=unused-argument
 
             print('Initialized!')
             # Loop through training steps.
-            print('Total number of iterations = ' + str(int(num_epochs * train_size / cfg.BATCH_SIZE)))
+            print('Total number of iterations = ' + str(int(num_epochs * train_size / BATCH_SIZE)))
 
             training_indices = range(train_size)
 
@@ -280,12 +310,12 @@ def main(argv=None):  # pylint: disable=unused-argument
                 # Permute training indices
                 perm_indices = numpy.random.permutation(training_indices)
 
-                steps_per_epoch = int(train_size / cfg.BATCH_SIZE)
+                steps_per_epoch = int(train_size / BATCH_SIZE)
 
                 for step in range(steps_per_epoch):
 
-                    offset = (step * cfg.BATCH_SIZE) % (train_size - cfg.BATCH_SIZE)
-                    batch_indices = perm_indices[offset:(offset + cfg.BATCH_SIZE)]
+                    offset = (step * BATCH_SIZE) % (train_size - BATCH_SIZE)
+                    batch_indices = perm_indices[offset:(offset + BATCH_SIZE)]
 
                     # Compute the offset of the current minibatch in the data.
                     # Note that we could use better randomization across epochs.
@@ -323,22 +353,22 @@ def main(argv=None):  # pylint: disable=unused-argument
         prediction_training_dir = "predictions_training/"
         if not os.path.isdir(prediction_training_dir):
             os.mkdir(prediction_training_dir)
-        """
-        for i in range(1, cfg.TRAINING_SIZE + 1):
+        
+        for i in range(1, TRAINING_SIZE + 1):
             pimg = get_prediction_with_groundtruth(train_data_filename, i)
             Image.fromarray(pimg).save(prediction_training_dir + "prediction_" + str(i) + ".png")
             oimg = get_prediction_with_overlay(train_data_filename, i)
             oimg.save(prediction_training_dir + "overlay_" + str(i) + ".png") 
-        """
+        
         print('Predicting on testset')
 
-        testing_dir = 'data/testing/' #path for test images
-        test_images = 'predictions/testing/' #path to save test predictions
+        testing_dir = os.path.join(os.path.join(str(Path.cwd()), 'data'), 'testing') #path for test images
+        test_images = os.path.join(str(Path.cwd()), 'predictions')  #path to save test predictions
 
         # creating test predictions
         for i in range(1,51):
             print('predicting image %d'%i)
-            imgpath = testing_dir + 'test_%d/'%i + 'test_%d.png'%i #the path for test image i
+            imgpath = os.path.join(testing_dir, 'test_%d.png'%i) 
 
             # generating prediction
             pimg = get_prediction(mpimg.imread(imgpath))
@@ -355,13 +385,14 @@ def main(argv=None):  # pylint: disable=unused-argument
             #creating image from array for viz purposes
             img = Image.fromarray(gt_img_3c)
             #saving the prediction image
-            img.save(test_images + 'prediction_' + str(i) + '.png')
-
+            img.save(os.path.join(test_images, '%d.png'%i))
+            """
             #saving predictions with overlay over groundtruth
             img = mpimg.imread(imgpath)
             img_prediction = get_prediction(img)
             oimg = make_img_overlay(img, img_prediction)
             oimg.save(test_images + 'overlay_'+str(i)+'.png')
+            """
             
 
 

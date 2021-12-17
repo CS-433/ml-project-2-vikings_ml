@@ -2,8 +2,14 @@ import numpy as np
 import os
 import matplotlib.image as mpimg
 from PIL import Image
-import config as cfg
 import tensorflow as tf
+
+IMG_WIDTH = 0
+IMG_HEIGHT = 0
+N_PATCHES_PER_IMAGE = 0
+IMG_PATCH_SIZE = 16
+PIXEL_DEPTH = 255
+
 
 def img_crop(im, w, h):
     ''' (ETH) Extracting patches of width w and height h from an image
@@ -53,14 +59,14 @@ def extract_data(folderpath):
     """
     files = os.listdir(folderpath)
     n = len(files)
-    imgs = [mpimg.imread(folderpath+files[i]) for i in range(n)]
+    imgs = [mpimg.imread(os.path.join(folderpath, files[i])) for i in range(n)]
 
     num_images = len(imgs)
-    cfg.IMG_WIDTH = imgs[0].shape[0]
-    cfg.IMG_HEIGHT = imgs[0].shape[1]
-    cfg.N_PATCHES_PER_IMAGE = (cfg.IMG_WIDTH/cfg.IMG_PATCH_SIZE)*(cfg.IMG_HEIGHT/cfg.IMG_PATCH_SIZE)
+    IMG_WIDTH = imgs[0].shape[0]
+    IMG_HEIGHT = imgs[0].shape[1]
+    N_PATCHES_PER_IMAGE = (IMG_WIDTH/IMG_PATCH_SIZE)*(IMG_HEIGHT/IMG_PATCH_SIZE)
 
-    img_patches = [img_crop(imgs[i], cfg.IMG_PATCH_SIZE, cfg.IMG_PATCH_SIZE) for i in range(num_images)]
+    img_patches = [img_crop(imgs[i], IMG_PATCH_SIZE, IMG_PATCH_SIZE) for i in range(num_images)]
     data = [img_patches[i][j] for i in range(len(img_patches)) for j in range(len(img_patches[i]))]
     data = np.asarray(data)
     return data
@@ -105,14 +111,14 @@ def extract_labels(folderpath):
     files = os.listdir(folderpath)
     n = len(files)
     for i in range(n):
-        img = mpimg.imread(folderpath+files[i])
+        img = mpimg.imread(os.path.join(folderpath, files[i]))
         try:
             gt_imgs.append(img[:,:,0])
         except:
             gt_imgs.append(img)
 
     num_images = len(gt_imgs)
-    gt_patches = [img_crop(gt_imgs[i], cfg.IMG_PATCH_SIZE, cfg.IMG_PATCH_SIZE) for i in range(num_images)]
+    gt_patches = [img_crop(gt_imgs[i], IMG_PATCH_SIZE, IMG_PATCH_SIZE) for i in range(num_images)]
     data = np.asarray([gt_patches[i][j] for i in range(len(gt_patches)) for j in range(len(gt_patches[i]))])
     labels = np.asarray([value_to_class(np.mean(data[i])) for i in range(len(data))])
     # Convert to dense 1-hot representation.
@@ -169,7 +175,7 @@ def img_float_to_uint8(img):
         converted array'''
 
     rimg = img - np.min(img)
-    rimg = (rimg / np.max(rimg) * cfg.PIXEL_DEPTH).round().astype(np.uint8)
+    rimg = (rimg / np.max(rimg) * PIXEL_DEPTH).round().astype(np.uint8)
     return rimg
 
 def concatenate_images(img, gt_img):
@@ -219,7 +225,7 @@ def make_img_overlay(img, predicted_img):
     w = img.shape[0]
     h = img.shape[1]
     color_mask = np.zeros((w, h, 3), dtype=np.uint8)
-    color_mask[:, :, 0] = predicted_img*cfg.PIXEL_DEPTH
+    color_mask[:, :, 0] = predicted_img*PIXEL_DEPTH
 
     img8 = img_float_to_uint8(img)
     background = Image.fromarray(img8, 'RGB').convert("RGBA")
