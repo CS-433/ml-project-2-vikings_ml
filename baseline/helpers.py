@@ -88,18 +88,35 @@ def concatenate_images(img, gt_img):
 
 
 def img_crop(im, w, h):
-    list_patches = []
-    imgwidth = im.shape[0]
-    imgheight = im.shape[1]
-    is_2d = len(im.shape) < 3
-    for i in range(0, imgheight, h):
-        for j in range(0, imgwidth, w):
-            if is_2d:
-                im_patch = im[j:j+w, i:i+h]
-            else:
-                im_patch = im[j:j+w, i:i+h, :]
-            list_patches.append(im_patch)
-    return list_patches
+  """ Cropping a given image to the desired width and height.
+  
+  Parameters
+  ----------
+  im: ndarray
+    The desired image to crop
+  w: int
+    The desired width of the crop
+  h: int
+    The desired height of the crop
+  
+  Returns
+  -------
+  list_patches: ndarray
+    An array of the cropped picture
+  """
+  
+  list_patches = []
+  imgwidth = im.shape[0]
+  imgheight = im.shape[1]
+  is_2d = len(im.shape) < 3
+  for i in range(0, imgheight, h):
+      for j in range(0, imgwidth, w):
+          if is_2d:
+              im_patch = im[j:j+w, i:i+h]
+          else:
+              im_patch = im[j:j+w, i:i+h, :]
+          list_patches.append(im_patch)
+  return list_patches
 
 
 def extract_features(img):
@@ -175,7 +192,7 @@ def value_to_class(v, foreground_threshold):
 
 
 def mask_to_submission_strings(image_filename, thr):
-    """ Reads a single image and outputs the strings that should go into the submission file.
+    """ Reading a single image and outputs the strings that should go into the submission file.
 
     Parameters
     ------------
@@ -200,7 +217,7 @@ def mask_to_submission_strings(image_filename, thr):
 
 
 def masks_to_submission(submission_filename, thr, *image_filenames):
-    """ Converts images into a submission file.
+    """ Converting images into a submission file.
 
     Parameters
     ------------
