@@ -12,7 +12,7 @@ from re import A
 import sys
 import matplotlib.image as mpimg
 from PIL import Image
-from helpers import img_crop, extract_data, extract_labels, label_to_img, make_img_overlay, concatenate_images, img_float_to_uint8
+from handling_images import img_crop, extract_data, extract_labels, label_to_img, make_img_overlay, concatenate_images, img_float_to_uint8
 import numpy
 import tensorflow as tf
 from pathlib import Path
