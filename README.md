@@ -1,7 +1,7 @@
 # CS-433 - PROJECT 2 - ML_Vikings
 
 ## Description
-This project is the second of two in the EPFL course "CS-433 Machine Learning". The aim of the project is solve the AICrowd challenge Road Segmenation hosted by MLO EPFL. Our best submission achieved a F1-score of 0.901 and can be found here: https://www.aicrowd.com/challenges/epfl-ml-road-segmentation/submissions/167620. 
+This project is the second of two in the EPFL course "CS-433 Machine Learning". The aim of the project is solve the AICrowd challenge Road Segmenation hosted by MLO EPFL. 
 
 A complete challenge description as well as the training and test data provided, can be found at:\
 https://www.aicrowd.com/challenges/epfl-ml-road-segmentation
@@ -78,32 +78,27 @@ This will yield a prediction file `______.csv`.
 └── requirements.txt
 ```
 
-## Overview of files
+## Overview of key files and folders
 
-The folder `Linear/`contains helper functions for our linear regression models. These are mainly for used for our ridge regression models.
+The folder `data/` contains the original train and test data as well as the 2 augmented setups (`training` and `training_double` respectively) with a 90/10 split.
 
-The folder `Logistic/` contains helper functions for our logistic regression model.
+The folder `baseline/` contains helper functions for our logistic regression model.
 
-`feature_processing.py` contains helper functions for feature processing, where some are general while other are specific for our logistic regression model and our ridge regression models.
+The folder `unet_classical/` contains helper functions for our logistic regression model.
 
-`helpers.py` contains general helper functions for the project.
+The folder `seg_mod_unet/` contains helper functions for our logistic regression model.
 
-`loss.py` contains a function for computing the loss of model with a desired loss function.
-
-`predict.py` contains functions for making predictions.
-
-`proj1_helpers.py` contains helper functions for the project, mainly those that are provided by the course staff.
-
-`opti_hyperparameters.ipynb` contains functions that make visualiziations of our choices of hyperparameters.
+The script `augmentation.py` contains the functions used to generate augmentations of the original data set.
 
 The notebooks `logistic_regression.ipynb`, `ridge_regression_three.ipynb` and `ridge_regression.ipynb` contains feature processing and training of the models, as well as prediction generation.
 
-The script `run.py` generates the submission uploaded to AICrowd with submission ID [#164073](https://www.aicrowd.com/challenges/epfl-machine-learning-higgs/submissions/164073). This is the submission we are referring to in the project report.
+The script `run.py` generates the submission uploaded to AICrowd with submission ID [#167620](https://www.aicrowd.com/challenges/epfl-ml-road-segmentation/submissions/167620). This is the submission which recieved an F1-score of 0.901 and are referring to in the project report.
 
 The file `report.pdf` contains our report documenting the project.
 
-## Authors
 
+
+## Authors
 Sigurd Kampevold Johanson - sigurd.johanson@epfl.ch\
 Benjamin Rike - benjamin.rike@epfl.ch\
 Nikolai Beck Jensen - nikolai.jensen@epfl.ch
