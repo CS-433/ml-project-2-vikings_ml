@@ -24,12 +24,22 @@ The project uses the following external libraries
 If these libraries are not currently installed in your environment, they can be installed installing the requirements.txt file as follows:
 `$ pip install -r requirements.txt`
 
-To run the project, you have to download the trained model files from https://drive.google.com/drive/folders/1o5Rg-aVe2lkL_pcW1sLoRvFd2xuay8hn?usp=sharing as the files with the model parameters are too large to be pushed to GitHub. 
+There are two main ways to run the code anew. We reccommend using the trained models, but the model can also be trained from scratch. Below, the instructions for each of the options follows:
+
+**Trained models**
+
+To run the project, you have to download the trained model files from https://drive.google.com/drive/folders/1o5Rg-aVe2lkL_pcW1sLoRvFd2xuay8hn?usp=sharing as the files with the model parameters are too large to be pushed to GitHub. After downloading the files, put the folder into the repository.
 
 After navigating to the project directry, you might run the following command:
 `python3 run.py`
 
-This will yield a prediction file `______.csv`.
+This will yield a prediction file `ensemble.csv`.
+
+**Train model from scratch**
+
+If you want to train the model from scratch, we reccommend using Google Colab as the model is computionally expensive to train. Other GPU services can also be utlized, but we provide the instructions for Colab.
+
+__TODO__
 
 ## Overview of folder structure
 
