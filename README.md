@@ -4,3 +4,8 @@ This repository contains our contributions for the AICrowd challenge Road Segmen
 
 The repository is structured as follows:
 
+## External Libraries
+* `segmentation_models`
+* TensorFlow
+* Keras
+* SciKit Learn
