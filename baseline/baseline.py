@@ -1,10 +1,10 @@
 """
 Baseline for machine learning project on road segmentation.
-This simple baseline consits of a CNN with two convolutional+pooling layers with a soft-max loss
+This simple baseline consists of a CNN with two convolutional + pooling layers with a soft-max loss.
 
 Credits: Aurelien Lucchi, ETH Zürich
 
-Code updated to be compatible with TensorFlow 2.x
+Code updated to be compatible with TensorFlow 2.x, as well as parts are commented out for our needs.
 """
 
 import os
@@ -51,9 +51,11 @@ def error_rate(predictions, labels):
     labels: ndarray
         Numpy array with true labels
     
-    returns
-    The error rate
+    Returns
+    -------
+        The error rate
     """
+
     return 100.0 - (
         100.0 *
         numpy.sum(numpy.argmax(predictions, 1) == numpy.argmax(labels, 1)) /
@@ -65,7 +67,7 @@ def main(argv=None):  # pylint: disable=unused-argument
     # Added to be able to run as Tensorflow 2
     tf.compat.v1.disable_eager_execution()
 
-    #defining paths to data
+    # Defining paths to data
     if AUG:
         data_dir = os.path.join(os.path.join(str(Path.cwd()), 'data'), 'training')
         train_data_filename = os.path.join(os.path.join(data_dir, 'images'),'90-split')
@@ -77,7 +79,7 @@ def main(argv=None):  # pylint: disable=unused-argument
         TRAINING_SIZE = 100
     # Extract it into numpy arrays.
     # train_data here contains a list with standardized RGB values in the most inner array, 
-    # inside patches of 16 pixels, inside array of all image pixels, inside array of all images
+    # Inside patches of 16 pixels, inside array of all image pixels, inside array of all images
     train_data = extract_data(train_data_filename)
 
     # The same yields for the labels
@@ -186,7 +188,7 @@ def main(argv=None):  # pylint: disable=unused-argument
     # We will replicate the model structure for the training subgraph, as well
     # as the evaluation subgraphs, while sharing the trainable parameters.
     def model(data, train=False):
-        """The Model definition."""
+        """ The Model definition. """
         # 2D convolution, with 'SAME' padding (i.e. the output feature map has
         # the same size as the input). Note that {strides} is a 4D array whose
         # shape matches the data layout: [image index, y, x, depth].
@@ -194,8 +196,10 @@ def main(argv=None):  # pylint: disable=unused-argument
                             filters=conv1_weights,
                             strides=[1, 1, 1, 1],
                             padding='SAME')
+        
         # Bias and rectified linear non-linearity.
         relu = tf.nn.relu(tf.nn.bias_add(conv, conv1_biases))
+        
         # Max pooling. The kernel size spec {ksize} also follows the layout of
         # the data. Here we have a pooling window of 2, and a stride of 2.
         pool = tf.nn.max_pool2d(input=relu,
@@ -226,9 +230,11 @@ def main(argv=None):  # pylint: disable=unused-argument
         reshape = tf.reshape(
             pool2,
             [pool_shape[0], pool_shape[1] * pool_shape[2] * pool_shape[3]])
+        
         # Fully connected layer. Note that the '+' operation automatically
         # broadcasts the biases.
         hidden = tf.nn.relu(tf.matmul(reshape, fc1_weights) + fc1_biases)
+        
         # Add a 50% dropout during training only. Dropout also scales
         # activations such that no rescaling is needed at evaluation time.
         if train:
@@ -239,6 +245,7 @@ def main(argv=None):  # pylint: disable=unused-argument
 
     # Training computation: logits + cross-entropy loss.
     logits = model(train_data_node, True)  # BATCH_SIZE*NUM_LABELS
+    
     # print 'logits = ' + str(logits.get_shape()) + ' train_labels_node = ' + str(train_labels_node.get_shape())
 
     loss = tf.reduce_mean(
@@ -354,6 +361,7 @@ def main(argv=None):  # pylint: disable=unused-argument
                 # Save the variables to disk.
                 save_path = saver.save(s, FLAGS.train_dir + "/model.ckpt")
                 print("Model saved in file: %s" % save_path)
+        
         """
         print("Running prediction on training set")
         prediction_training_dir = "predictions_training/"
@@ -366,6 +374,7 @@ def main(argv=None):  # pylint: disable=unused-argument
             oimg = get_prediction_with_overlay(train_data_filename, i)
             oimg.save(prediction_training_dir + "overlay_" + str(i) + ".png") 
         """
+
         #print('Predicting on testing set')
 
         testing_dir = os.path.join(os.path.join(str(Path.cwd()), 'data'), 'testing') #path for test images
@@ -373,7 +382,7 @@ def main(argv=None):  # pylint: disable=unused-argument
         val_dir = os.path.join(os.path.join(val_dir, 'images'), '10-split')
         test_images = os.path.join(str(Path.cwd()), 'predictions')  #path to save test predictions
 
-        # creating test predictions
+        # Creating test predictions
         """
         for i in range(1,51):
             print('predicting image %d'%i)
@@ -410,7 +419,7 @@ def main(argv=None):  # pylint: disable=unused-argument
         for file in files:
             pimg = get_prediction(mpimg.imread(os.path.join(val_dir, file)))
 
-            #converting prediction such that it can be visualized
+            # Converting prediction such that it can be visualized
             w = pimg.shape[0]
             h = pimg.shape[1]
             gt_img_3c = numpy.zeros((w, h, 3), dtype=numpy.uint8)
@@ -419,9 +428,10 @@ def main(argv=None):  # pylint: disable=unused-argument
             gt_img_3c[:, :, 1] = gt_img8
             gt_img_3c[:, :, 2] = gt_img8
 
-            #creating image from array for viz purposes
+            # Creating image from array for viz purposes
             img = Image.fromarray(gt_img_3c)
-            #saving the prediction image
+            
+            # Saving the prediction image
             img.save(os.path.join(test_images, '%d.png'%i))
             i+=1
 
