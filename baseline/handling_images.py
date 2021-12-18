@@ -1,3 +1,5 @@
+''' Helper functions for handling images baseline.py provided by the course staff. '''
+
 import numpy as np
 import os
 import matplotlib.image as mpimg
@@ -28,6 +30,7 @@ def img_crop(im, w, h):
     list_patches: list
         A list containing patches
     '''
+
     list_patches = []
     imgwidth = im.shape[0]
     imgheight = im.shape[1]
@@ -57,6 +60,7 @@ def extract_data(folderpath):
     data: ndarray
         A numpy array containting the images
     """
+
     files = os.listdir(folderpath)
     n = len(files)
     imgs = [mpimg.imread(os.path.join(folderpath, files[i])) for i in range(n)]
@@ -72,7 +76,7 @@ def extract_data(folderpath):
     return data
 
 def value_to_class(v):
-    ''' (ETH) Assign labels to a patch v
+    ''' (ETH) Assign labels to a patch v.
     
     Parameters
     ----------
@@ -82,7 +86,8 @@ def value_to_class(v):
     Returns
     --------
     [0,1] if road, [1,0] elsewise
-        Labels for the patch'''
+        Labels for the patch
+    '''
 
     foreground_threshold = 0.25  # percentage of pixels > 1 required to assign a foreground label to a patch
     df = np.sum(v)
@@ -107,6 +112,7 @@ def extract_labels(folderpath):
     labels: ndarray
         1-hot matrix [image index, label index]
     """
+
     gt_imgs = []
     files = os.listdir(folderpath)
     n = len(files)
@@ -121,6 +127,7 @@ def extract_labels(folderpath):
     gt_patches = [img_crop(gt_imgs[i], IMG_PATCH_SIZE, IMG_PATCH_SIZE) for i in range(num_images)]
     data = np.asarray([gt_patches[i][j] for i in range(len(gt_patches)) for j in range(len(gt_patches[i]))])
     labels = np.asarray([value_to_class(np.mean(data[i])) for i in range(len(data))])
+    
     # Convert to dense 1-hot representation.
     labels = labels.astype(np.float32)
     
@@ -128,9 +135,9 @@ def extract_labels(folderpath):
 
 
 def label_to_img(imgwidth, imgheight, w, h, labels):
-    ''' Convert array of labels to an image 
+    ''' Converting array of labels to an image.
     
-    parameter
+    Parameter
     ---------
     imgwidth: int
         Width of image
@@ -143,10 +150,11 @@ def label_to_img(imgwidth, imgheight, w, h, labels):
     labels: ndarray
         The labels
         
-    returns
+    Returns
     --------
     array_labels: ndarray
-        Array of zeros and ones in image format'''
+        Array of zeros and ones in image format
+    '''
 
     array_labels = np.zeros([imgwidth, imgheight])
     idx = 0
@@ -162,7 +170,7 @@ def label_to_img(imgwidth, imgheight, w, h, labels):
 
 
 def img_float_to_uint8(img):
-    '''converts image array with floats to uint8
+    ''' Converting image array with floats to uint8
     
     parameters
     -----------
@@ -179,19 +187,20 @@ def img_float_to_uint8(img):
     return rimg
 
 def concatenate_images(img, gt_img):
-    '''Concatenate two images
+    ''' Concatenating two images
     
-    parameters
+    Parameters
     -----------
     img: ndarray
         image 1
     gt_img: ndarray
         image 2
     
-    returns
+    Returns
     --------
     cimg: ndarray
-        concatenated image'''
+        concatenated image
+    '''
 
     n_channels = len(gt_img.shape)
     w = gt_img.shape[0]
