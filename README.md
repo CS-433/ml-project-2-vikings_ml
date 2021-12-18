@@ -68,30 +68,14 @@ This will yield a prediction file `______.csv`.
 │   ├── helpers.py
 │   └── mask_to_submission.py
 │ 
-├── src
-│   ├── Linear
-│   │   ├── cross_validation.py
-│   │   ├── gradients.py
-│   │   └── ridge_model.py
-│   │
-│   ├── Logistic
-│   │   └── logistic_helpers.py
-│   │
-│   ├── logistic_regression.ipynb
-│   ├── opti_hyperparameters.ipynb
-│   ├── ridge_regression_three.ipynb
-│   ├── ridge_regression.ipynb
-│   ├── feature_processing.py
-│   ├── helpers.py
-│   ├── implementations.py
-│   ├── loss.py
-│   ├── predict.py
-│   ├── proj1_helpers.py
-│   └── run.py
-│
-├── submission_three_model.csv
-├── README.md
-└── report.pdf
+├── predictions
+│   └── .
+│ 
+├── Ensemble.ipynb
+├── augmentation.py
+├── run.py
+├── story.ipynb
+└── requirements.txt
 ```
 
 ## Overview of files
