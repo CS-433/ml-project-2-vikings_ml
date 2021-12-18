@@ -39,7 +39,7 @@ X4 = 'predictions/m4_pred.csv'
 X5 = 'predictions/m5_pred.csv'
 
 # defining if model should be trained or not
-TRAIN = False
+TRAIN = False #TODO: Use this as an argument in running the file
 
 # defining backbone for the model
 BACKBONE = 'resnet34'
