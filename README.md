@@ -58,7 +58,6 @@ This will yield a prediction file `______.csv`.
 ├── baseline
 │   ├── Logistic.ipynb
 │   ├── baseline.py
-│   ├── handling_images.py
 │   └── helpers.py
 │ 
 ├── unet_classical
