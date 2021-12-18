@@ -72,6 +72,7 @@ def main(argv=None):  # pylint: disable=unused-argument
         data_dir = os.path.join(os.path.join(str(Path.cwd()), 'data'), 'training')
         train_data_filename = os.path.join(os.path.join(data_dir, 'images'),'90-split')
         train_labels_filename = os.path.join(os.path.join(data_dir, 'groundtruth'), '90-split') 
+        TRAINING_SIZE = 1700
     else:
         data_dir = os.path.join(os.path.join(str(Path.cwd()), 'data'), 'original')
         train_data_filename = os.path.join(data_dir, 'images')
