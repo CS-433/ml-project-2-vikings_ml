@@ -49,7 +49,25 @@ This will yield a prediction file `______.csv`.
 │       └── images
 │           ├── 10-split
 │           └── 90-split
+├── baseline
+│   ├── Logistic.ipynb
+│   ├── baseline.py
+│   ├── handling_images.py
+│   └── helpers.py
+│ 
+├── unet_classical
+│   ├── Unet.py
+│   ├── data_handling_unet.py
+│   ├── run_unet_nb.ipynb
+│   └── train_unet.py
 │
+├── seg_mod_unet
+│   ├── data_handling.py
+│   ├── ensemble_model.ipynb
+│   ├── final_model.ipynb
+│   ├── helpers.py
+│   └── mask_to_submission.py
+│ 
 ├── src
 │   ├── Linear
 │   │   ├── cross_validation.py
