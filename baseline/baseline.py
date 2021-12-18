@@ -62,29 +62,30 @@ def error_rate(predictions, labels):
         predictions.shape[0])
 
 
-def main(argv=None):  # pylint: disable=unused-argument
+def main(argv=AUG):  # pylint: disable=unused-argument
 
     # Added to be able to run as Tensorflow 2
     tf.compat.v1.disable_eager_execution()
-
     # Defining paths to data
-    if AUG:
+    if AUG == 'True':
+        print('Running model with data augmentation')
         data_dir = os.path.join(os.path.join(str(Path.cwd()), 'data'), 'training')
         train_data_filename = os.path.join(os.path.join(data_dir, 'images'),'90-split')
         train_labels_filename = os.path.join(os.path.join(data_dir, 'groundtruth'), '90-split') 
         TRAINING_SIZE = 1700
+        train_data = extract_data(train_data_filename)
+        train_labels = extract_labels(train_labels_filename)
     else:
+        print('Running model without data augmentation')
         data_dir = os.path.join(os.path.join(str(Path.cwd()), 'data'), 'original')
         train_data_filename = os.path.join(data_dir, 'images')
         train_labels_filename = os.path.join(data_dir, 'groundtruth') 
         TRAINING_SIZE = 100
+        train_data = extract_data(train_data_filename)[:100]
+        train_labels = extract_labels(train_labels_filename)[:100]
     # Extract it into numpy arrays.
     # train_data here contains a list with standardized RGB values in the most inner array, 
     # Inside patches of 16 pixels, inside array of all image pixels, inside array of all images
-    train_data = extract_data(train_data_filename)
-
-    # The same yields for the labels
-    train_labels = extract_labels(train_labels_filename)
 
     # Can be considered as an equivalent to iterations
     num_epochs = NUM_EPOCHS
