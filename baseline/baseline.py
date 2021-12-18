@@ -74,8 +74,7 @@ def main(argv=None):  # pylint: disable=unused-argument
         data_dir = os.path.join(os.path.join(str(Path.cwd()), 'data'), 'original')
         train_data_filename = os.path.join(data_dir, 'images')
         train_labels_filename = os.path.join(data_dir, 'groundtruth') 
-    print(sys.argv[1])
-    print(AUG)
+        TRAINING_SIZE = 100
     # Extract it into numpy arrays.
     # train_data here contains a list with standardized RGB values in the most inner array, 
     # inside patches of 16 pixels, inside array of all image pixels, inside array of all images
