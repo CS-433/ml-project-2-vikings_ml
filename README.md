@@ -12,7 +12,7 @@ The repository is structured as follows:
 ## Installing and running the code
 
 Start by pulling from the github as follows:\
-`git clone https://github.com/CS-433/ml-project-1-ml_vikings.git` \
+`git clone https://github.com/CS-433/ml-project-2-ml_vikings.git` \
 `cd ml-project-1-ml_vikings`
 
 or download the delivered `.zip`-file.
@@ -30,8 +30,25 @@ This will yield a prediction file `______.csv`.
 ```
 .
 ├── data
-│   ├── sample_submission.csv
-│   └── train.csv
+│   ├── original
+│   │   ├── groundtruth
+│   │   └── images
+│   ├── testing
+│   │   └── .
+│   ├── training
+│   │   ├── groundtruth
+│   │   │   ├── 10-split
+│   │   │   └── 90-split
+│   │   └── images
+│   │       ├── 10-split
+│   │       └── 90-split
+│   └── training_double
+│       ├── groundtruth
+│       │   ├── 10-split
+│       │   └── 90-split
+│       └── images
+│           ├── 10-split
+│           └── 90-split
 │
 ├── src
 │   ├── Linear
