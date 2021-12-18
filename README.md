@@ -12,15 +12,21 @@ The repository is structured as follows:
 ## Installing and running the code
 
 Start by pulling from the github as follows:\
-`git clone https://github.com/CS-433/ml-project-2-ml_vikings.git` \
-`cd ml-project-1-ml_vikings`
+`$ git clone https://github.com/CS-433/ml-project-2-ml_vikings.git` \
+`$ cd ml-project-2-ml_vikings`
 
-or download the delivered `.zip`-file.
+The project uses the following external libraries
+ * `segmentation_models`
+ * TensorFlow
+ * Keras
+ * SciKit Learn
 
-To run the project, you have to download the trained model files from **google colab link**, as the files with the model parameters are too large to be pushed to GitHub. 
+If these libraries are not currently installed in your environment, they can be installed installing the requirements.txt file as follows:
+`$ pip install -r requirements.txt`
 
-After navigating to the project directry, you might run the following commands:
-`cd src`\
+To run the project, you have to download the trained model files from https://drive.google.com/drive/folders/1o5Rg-aVe2lkL_pcW1sLoRvFd2xuay8hn?usp=sharing as the files with the model parameters are too large to be pushed to GitHub. 
+
+After navigating to the project directry, you might run the following command:
 `python3 run.py`
 
 This will yield a prediction file `______.csv`.
@@ -82,19 +88,17 @@ This will yield a prediction file `______.csv`.
 
 The folder `data/` contains the original train and test data as well as the 2 augmented setups (`training` and `training_double` respectively) with a 90/10 split.
 
-The folder `baseline/` contains helper functions for our logistic regression model.
+The folder `baseline/` contains the implementation and the scripts to train the baseline CNN and LogReg. 
 
-The folder `unet_classical/` contains helper functions for our logistic regression model.
+The folder `unet_classical/` contains the implementation and the scripts to train the simple U-net.
 
-The folder `seg_mod_unet/` contains helper functions for our logistic regression model.
+The folder `seg_mod_unet/` contains the implementation and the scripts to train the ensemble of U-nets with the resnet backbone. 
 
 The script `augmentation.py` contains the functions used to generate augmentations of the original data set.
 
-The notebooks `logistic_regression.ipynb`, `ridge_regression_three.ipynb` and `ridge_regression.ipynb` contains feature processing and training of the models, as well as prediction generation.
-
 The script `run.py` generates the submission uploaded to AICrowd with submission ID [#167620](https://www.aicrowd.com/challenges/epfl-ml-road-segmentation/submissions/167620). This is the submission which recieved an F1-score of 0.901 and are referring to in the project report.
 
-The file `report.pdf` contains our report documenting the project.
+The file `report.pdf` contains our report documenting the project. Complimentary to this is the `story.ipynb` notebook. 
 
 
 
