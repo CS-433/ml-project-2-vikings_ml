@@ -40,7 +40,7 @@ This will yield a prediction file `ensemble.csv`.
 If you want to train the model from scratch, we reccommend using Google Colab as the model is computionally expensive to train. Other GPU services can also be utlized, but we provide the instructions for Colab.
 
 1. Create a shortcut on the "desktop" of your Google Drive of this folder: https://drive.google.com/drive/folders/1-3Rjf92mn-WFVhhwdblE1-VnflLfw74X?usp=sharing
-2. Find the file "final_model.ipynb in the seg_model_unet folder in this repository and upload it to Google Colab
+2. Find the file `final_model.ipynb` in the seg_model_unet folder in this repository and upload it to Google Colab
 3. Run the code cells in the notebook in chronological order and a prediction file named `ensemble.ipynb` will appear in the file directory on the left
 
 ## Overview of folder structure
