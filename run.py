@@ -14,6 +14,7 @@ from seg_mod_unet.data_handling import extract_data, extract_data_test, extract_
 from seg_mod_unet.helpers import window_predict, save_predictions, masks_to_submission
 from pathlib import Path
 import os
+import sys
 
 # data paths
 data_path = os.path.join(str(Path.cwd()), 'data')
@@ -39,7 +40,7 @@ X4 = 'predictions/m4_pred.csv'
 X5 = 'predictions/m5_pred.csv'
 
 # defining if model should be trained or not
-TRAIN = False #TODO: Use this as an argument in running the file
+TRAIN = sys.argv[1] 
 
 # defining backbone for the model
 BACKBONE = 'resnet34'
@@ -65,7 +66,7 @@ foreground_threshold = 0.04
 
 
 def main():
-    if TRAIN:
+    if TRAIN == 'True':
         #TODO: Test if this code is memory robust
 
         # Extracting the data and masks
