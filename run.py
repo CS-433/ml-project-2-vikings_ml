@@ -182,7 +182,7 @@ def main():
     df = df['prediction']
 
     # writing predctions to csv
-    df.to_csv('predctions/ensemble.csv')
+    df.to_csv('predictions/ensemble.csv')
 
 
 if __name__ == "__main__":
