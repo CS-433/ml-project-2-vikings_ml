@@ -1,5 +1,4 @@
 'This file contains the ensemble model that gave the best score on AICrowd with a F1-score of 0.901'
-#TODO: Set optimal threshold?
 #TODO: Test code
 #TODO: Add my final datafolder, the one without splits
 
@@ -11,7 +10,7 @@ from tensorflow.keras.models import load_model
 import segmentation_models as sm
 sm.set_framework('tf.keras')
 from seg_mod_unet.data_handling import extract_data, extract_data_test, extract_labels
-from seg_mod_unet.helpers import window_predict, save_predictions, masks_to_submission
+from seg_mod_unet.helpers import window_predict, save_predictions, masks_to_submission, test_threshold
 from pathlib import Path
 import os
 import sys
@@ -61,30 +60,24 @@ batch_size = 32
 custom_objects = {'binary_crossentropy_plus_jaccard_loss':loss, 
                       'iou_score': sm.metrics.iou_score, 'f1-score': sm.metrics.FScore()}
                       
-# defining threhshold for attributing patch as road
-foreground_threshold = 0.04
+# defining threhshold for attributing patch as road for each model
+#TODO: Find optimums here
+thresholds = [0.04, 0.04, 0.04, 0.04, 0.04]
 
 
 def main():
     if TRAIN == 'True':
-        #TODO: Test if this code is memory robust
-
         # Extracting the data and masks
         x = extract_data(train_data_path)
         y = extract_labels(train_labels_path)
 
         # training 5 seperate models
         for i in range(0, 5):
-            x_train = x
-            y_train = y
             # Splitting the dataset into two, one training set and one validation set
-            #TODO: Test this code
-            x_val = x_train[i*340:(i+1)*340]
-            y_val = y_train[i*340:(i+1)*340]
-            x_train = np.delete(x_train, np.s_[i*340:(i+1)*340])
-            y_train = np.delete(y_train, np.s_[i*340:(i+1)*340])
+            x_val, y_val = x[340*i:340*(i+1)], y[340*i:340*(i+1)]
+            x_train, y_train = x[np.isin(np.arange(len(x)), np.arange(340*0,340*(0+1)), invert=True)], y[np.isin(np.arange(len(y)), np.arange(340*0,340*(0+1)), invert=True)]
 
-            # preprocessing input
+            # preprocessing training and validation data
             x_train = preprocess_input(x_train)
             x_val = preprocess_input(x_val)
 
@@ -92,24 +85,37 @@ def main():
             model = sm.Unet(BACKBONE, encoder_weights='imagenet', input_shape=(256, 256, 3))
 
             # adding  L2 kernel regularizer
-            sm.utils.set_regularization(model, kernel_regularizer=kernel_regularizer)
+            sm.utils.set_regularization(model, kernel_regularizer=keras.regularizers.l2(1))
 
             # compiling the model using Adam optimizer and Binary Cross Entropy with Jaccard loss
             model.compile(
-                optimizer,
-                loss=loss,
+                'Adam',
+                loss=sm.losses.bce_jaccard_loss,
                 metrics=[sm.metrics.iou_score, sm.metrics.FScore(),'accuracy'],
             )
 
             # saving the model thats scores best on the validation data
-            callbacks = [keras.callbacks.ModelCheckpoint(os.path.join(model_folder, "m%d.h5") % (i+1), save_best_only=True)]
-
+            callbacks = [keras.callbacks.ModelCheckpoint("models/m%d.h5"%(i+1), save_best_only=True)]
+            print("Training model %d\n"%(i+1))
             # training the model for 50 epochs with batch size = 32
             history = model.fit(x=x_train, y=y_train,
-            epochs=num_epochs, batch_size=batch_size,
+            epochs=50, batch_size=32,
             callbacks=callbacks,
             validation_data=(x_val,y_val)
             )
+
+            # testing the model and finding optimal threshold
+            model = load_model('models/m%d.h5'%(i+1), custom_objects
+                        = custom_objects)
+            
+            # generating predictions on validation set
+            y_pred = model.predict(x_val)
+            
+            # finding optimal threshold on validation set
+            thr = test_threshold(y_pred, y_val, 0, 30)
+
+            # adding the optimal threshold to the thresholds array
+            thresholds[i] = thr
 
 
 
@@ -144,7 +150,7 @@ def main():
         for j in range(1, 51):
             image_filename = 'predictions/test%d.png' % j
             image_filenames.append(image_filename)
-        masks_to_submission(submission_filename, foreground_threshold, *image_filenames)
+        masks_to_submission(submission_filename, thresholds[i], *image_filenames)
 
     " Making ensemble model predictions "
 

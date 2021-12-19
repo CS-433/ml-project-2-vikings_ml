@@ -163,3 +163,60 @@ def img_float_to_uint8(img):
     rimg = img - np.min(img)
     rimg = (rimg / np.max(rimg) * 255).round().astype(np.uint8)
     return rimg
+
+def test_threshold(preds, gts, min, max):
+  """
+  Finds the optimal threshold for labeling a patch as road. Searches with stepsize 0.01
+
+  parameters
+  -----------
+  preds: ndarray
+    Pixelwise label predictions of an iamge
+  gts:
+    Pixelwise labels for the original image
+  min:
+    100 times the value to start searching for an optimum
+  max:
+    100 times the value for stopping searching for an optimum
+  """
+  # defining a list of potential thresholds
+  thresholds = [0.01*i for i in range(min, max)]
+  # list for saving f1-scores
+  f1s = []
+  # saving highest f1-score 
+  highest = 0
+  foreground_threshold = 0
+  # iterating through each threshold and calculating F1-score and accuracy
+  for thr in thresholds:
+
+    # converting pixelwise predictions to patchwise predictions
+    y_pred_flattened = []
+    for im in preds:
+      for j in range(0, im.shape[1], patch_size):
+            for i in range(0, im.shape[0], patch_size):
+                patch = im[i:i + patch_size, j:j + patch_size]
+                label = patch_to_label(patch, thr)
+                y_pred_flattened.append(label)
+    y_pred_flattened = np.array(y_pred_flattened)
+
+    # converting mask to patchwise values
+    y_val_flattened = []
+    for im in gts:
+      for j in range(0, im.shape[1], patch_size):
+            for i in range(0, im.shape[0], patch_size):
+                patch = im[i:i + patch_size, j:j + patch_size]
+                label = patch_to_label(patch, thr)
+                y_val_flattened.append(label)
+
+    # calculating and storing f1-score and accuracy
+    f1 = f1_score(y_val_flattened, y_pred_flattened)
+    acc = accuracy_score(y_val_flattened, y_pred_flattened)
+    f1s.append(f1)
+
+    # setting foreground_threshold for future predcitions to thr if thr gives the best f1-score
+    if f1>highest:
+      foreground_threshold=thr
+      highest = f1
+
+  print("The best threshold is: %.2f and achieves a F1-score of : %.4f"%(foreground_threshold, highest))
+  return foreground_threshold
