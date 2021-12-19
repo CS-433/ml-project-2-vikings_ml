@@ -1,6 +1,5 @@
 'This file contains the ensemble model that gave the best score on AICrowd with a F1-score of 0.901'
 #TODO: Test code
-#TODO: Add my final datafolder, the one without splits
 #TODO: Test with fresh venv by running reuqirements.txt
 
 # imports
@@ -19,17 +18,17 @@ import sys
 # data paths
 data_path = os.path.join(str(Path.cwd()), 'data')
 train_path = os.path.join(data_path, 'training_final')
-train_data_path = os.path.join(train_path, 'images')
-train_labels_path = os.path.join(train_path, 'groundtruth')
-test_images_path = os.path.join(data_path, 'testing')
+train_data_path = os.path.join(train_path, 'images/')
+train_labels_path = os.path.join(train_path, 'groundtruth/')
+test_images_path = os.path.join(data_path, 'testing/')
 
 # model paths
 model_folder = os.path.join(str(Path.cwd()), 'models')
-m1_path = os.path.join(model_folder, 'm1.h')
-m2_path = os.path.join(model_folder, 'm2.h')
-m3_path = os.path.join(model_folder, 'm3.h')
-m4_path = os.path.join(model_folder, 'm4.h')
-m5_path = os.path.join(model_folder, 'm5.h')
+m1_path = os.path.join(model_folder, 'm1.h5')
+m2_path = os.path.join(model_folder, 'm2.h5')
+m3_path = os.path.join(model_folder, 'm3.h5')
+m4_path = os.path.join(model_folder, 'm4.h5')
+m5_path = os.path.join(model_folder, 'm5.h5')
 
 # filepaths to the five models' predictions on the test set
 X1 = 'predictions/m1_pred.csv'
@@ -39,7 +38,7 @@ X4 = 'predictions/m4_pred.csv'
 X5 = 'predictions/m5_pred.csv'
 
 # defining if model should be trained or not
-TRAIN = sys.argv[1] 
+TRAIN = sys.argv[0] 
 
 # defining backbone for the model
 BACKBONE = 'resnet34'
@@ -61,18 +60,19 @@ custom_objects = {'binary_crossentropy_plus_jaccard_loss':loss,
                       'iou_score': sm.metrics.iou_score, 'f1-score': sm.metrics.FScore()}
                       
 # defining threhshold for attributing patch as road for each model
-#TODO: Find optimums here
-thresholds = [0.04, 0.04, 0.04, 0.04, 0.04]
+thresholds = [0.13, 0.06, 0.08, 0.01, 0.04]
 
 
 def main():
     if TRAIN == 'True':
         # Extracting the data and masks
+        print(sys.argv[1])
         x = extract_data(train_data_path)
         y = extract_labels(train_labels_path)
 
         # training 5 seperate models
         for i in range(0, 5):
+            print("%d. iteration"%(i+1))
             # Splitting the dataset into two, one training set and one validation set
             x_val, y_val = x[340*i:340*(i+1)], y[340*i:340*(i+1)]
             x_train, y_train = x[np.isin(np.arange(len(x)), np.arange(340*0,340*(0+1)), invert=True)], y[np.isin(np.arange(len(y)), np.arange(340*0,340*(0+1)), invert=True)]
@@ -99,7 +99,7 @@ def main():
             print("Training model %d\n"%(i+1))
             # training the model for 50 epochs with batch size = 32
             history = model.fit(x=x_train, y=y_train,
-            epochs=50, batch_size=32,
+            epochs=1, batch_size=32,
             callbacks=callbacks,
             validation_data=(x_val,y_val)
             )
@@ -112,7 +112,7 @@ def main():
             y_pred = model.predict(x_val)
             
             # finding optimal threshold on validation set
-            thr = test_threshold(y_pred, y_val, 0, 30)
+            thr = test_threshold(y_pred, y_val, 0, 2)
 
             # adding the optimal threshold to the thresholds array
             thresholds[i] = thr
@@ -120,6 +120,7 @@ def main():
 
 
     # loading models
+    print('Loading models')
     m1 = load_model(m1_path, custom_objects=custom_objects)
     m2 = load_model(m2_path, custom_objects=custom_objects)
     m3 = load_model(m3_path, custom_objects=custom_objects)
@@ -127,7 +128,7 @@ def main():
     m5 = load_model(m5_path, custom_objects=custom_objects)
 
     models = [m1, m2, m3, m4, m5]
-
+    print('Loading test images')
     # loading test images
     test_images = extract_data_test(test_images_path)
 
@@ -136,13 +137,14 @@ def main():
 
     for i in range(len(models)):
         # generating predictions for the test images
+        print('Predicting for model %i'%(i+1))
         results = []
         for img in test_images:
             results.append(window_predict(img, models[i]))
 
         # generating and saving the prediction masks for the testset
-        for i in range(1, len(results)+1):
-            save_predictions(img, 'test%d'%i)
+        for k in range(1, len(results)+1):
+            save_predictions(img, 'test%d'%k)
 
         # generating the prediction file for the test set
         submission_filename = 'predictions/m%d_pred.csv' % (i+1)
@@ -151,10 +153,11 @@ def main():
             image_filename = 'predictions/test%d.png' % j
             image_filenames.append(image_filename)
         masks_to_submission(submission_filename, thresholds[i], *image_filenames)
+        print("Finished predicting model %d\n"%(i+1))
 
-    " Making ensemble model predictions "
 
     # reading the models' prediction into five dataframes
+    print("Creating ensemble predictions")
 
     df1 = pd.read_csv(X1)
     df1 = df1.set_index(['id'])
@@ -190,6 +193,7 @@ def main():
 
     # writing predctions to csv
     df.to_csv('predictions/ensemble.csv')
+    print("Prediction succeeded")
 
 
 if __name__ == "__main__":
