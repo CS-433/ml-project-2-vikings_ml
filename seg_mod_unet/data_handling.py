@@ -1,6 +1,9 @@
+''' Helper functions for handling images baseline.py provided by the course staff and ETH. '''
+
 import numpy as np
 import os
 import matplotlib.image as mpimg
+
 
 def extract_data(folderpath):
     """ (ETH) Extract the images into a 4D tensor [image index, y, x, channels].
@@ -24,6 +27,7 @@ def extract_data(folderpath):
     data = np.asarray(imgs)
     return data
 
+
 def extract_data_test(folderpath):
     """ (ETH) Extract the images into a 4D tensor [image index, y, x, channels].
     Values are rescaled from [0, 255] down to [-0.5, 0.5].
@@ -40,24 +44,24 @@ def extract_data_test(folderpath):
     data: ndarray
         A numpy array containting the images
     """
-    imgs=[]
-    for i in range(1,51):
-      img = mpimg.imread(folderpath+'test_%d.png'%i)
-      imgs.append(img)
+    imgs = []
+    for i in range(1, 51):
+        img = mpimg.imread(folderpath+'test_%d.png' % i)
+        imgs.append(img)
     data = np.asarray(imgs)
     return data
 
 
 def extract_labels(folderpath):
     """ (ETH) Extract the labels into a 1-hot matrix [image index, label index].
-    
+
     Parameters
     ----------
     filename: string
         The name of the image file
     num_images: int
         The number of images
-    
+
     Returns
     --------
     labels: ndarray
@@ -69,7 +73,7 @@ def extract_labels(folderpath):
     for i in range(n):
         img = mpimg.imread(folderpath+files[i])
         try:
-            gt_imgs.append(img[:,:,0])
+            gt_imgs.append(img[:, :, 0])
         except:
             gt_imgs.append(img)
 
