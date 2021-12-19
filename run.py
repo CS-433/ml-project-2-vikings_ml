@@ -1,6 +1,7 @@
 'This file contains the ensemble model that gave the best score on AICrowd with a F1-score of 0.901'
 #TODO: Test code
 #TODO: Add my final datafolder, the one without splits
+#TODO: Test with fresh venv by running reuqirements.txt
 
 # imports
 import numpy as np
