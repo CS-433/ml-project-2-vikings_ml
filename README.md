@@ -24,7 +24,7 @@ The project uses the following external libraries
 If these libraries are not currently installed in your environment, they can be installed installing the requirements.txt file as follows:
 `$ pip install -r requirements.txt`
 
-There are two main ways to run the code anew. We reccommend using the trained models, but the model can also be trained from scratch. Below, the instructions for each of the options follows:
+There are two main ways to run the code. We reccommend using the trained models, i.e. load the models from memory to test and predict, but the model can also be trained from scratch. Below, the instructions for each of the options follows:
 
 **Trained models**
 
@@ -41,7 +41,7 @@ If you want to train the model from scratch, we reccommend using Google Colab as
 
 1. Create a shortcut on the "desktop" of your Google Drive of this folder: https://drive.google.com/drive/folders/1-3Rjf92mn-WFVhhwdblE1-VnflLfw74X?usp=sharing
 2. Find the file "final_model.ipynb in the seg_model_unet folder in this repository and upload it to Google Colab
-3. __TODO__ Finish this
+3. Run the code cells in the notebook in chronological order and a prediction file named `ensemble.ipynb` will appear in the file directory on the left
 
 ## Overview of folder structure
 
