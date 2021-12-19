@@ -17,12 +17,11 @@ import sys
 
 # data paths
 data_path = os.path.join(str(Path.cwd()), 'data')
-train_path = os.path.join(data_path, 'training')
+train_path = os.path.join(data_path, 'training_final')
 train_data_path = os.path.join(train_path, 'images')
 train_labels_path = os.path.join(train_path, 'groundtruth')
 test_images_path = os.path.join(data_path, 'testing')
 
-#TODO: How to store models?
 # model paths
 model_folder = os.path.join(str(Path.cwd()), 'models')
 m1_path = os.path.join(model_folder, 'm1.h')
