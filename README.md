@@ -24,7 +24,7 @@ The project uses the following external libraries
 If these libraries are not currently installed in your environment, they can be installed installing the requirements.txt file as follows:
 `$ pip install -r requirements.txt`
 
-There are two main ways to run the code anew. We reccommend using the trained models, but the model can also be trained from scratch. Below, the instructions for each of the options follows:
+There are two main ways to run the code. We reccommend using the trained models, i.e. load the models from memory to test and predict, but the model can also be trained from scratch. Below, the instructions for each of the options follows:
 
 **Trained models**
 
