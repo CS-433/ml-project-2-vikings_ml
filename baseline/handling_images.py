@@ -130,7 +130,7 @@ def extract_labels(folderpath):
     
     # Convert to dense 1-hot representation.
     labels = labels.astype(np.float32)
-    
+    print(labels.shape)
     return labels
 
 

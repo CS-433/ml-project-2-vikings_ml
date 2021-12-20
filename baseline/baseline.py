@@ -81,8 +81,9 @@ def main(argv=AUG):  # pylint: disable=unused-argument
         train_data_filename = os.path.join(data_dir, 'images')
         train_labels_filename = os.path.join(data_dir, 'groundtruth') 
         TRAINING_SIZE = 100
-        train_data = extract_data(train_data_filename)[:100]
-        train_labels = extract_labels(train_labels_filename)[:100]
+        train_data = extract_data(train_data_filename)
+        train_labels = extract_labels(train_labels_filename)
+
     # Extract it into numpy arrays.
     # train_data here contains a list with standardized RGB values in the most inner array, 
     # Inside patches of 16 pixels, inside array of all image pixels, inside array of all images
@@ -104,8 +105,6 @@ def main(argv=AUG):  # pylint: disable=unused-argument
     idx0 = [i for i, j in enumerate(train_labels) if j[0] == 1]
     idx1 = [i for i, j in enumerate(train_labels) if j[1] == 1]
     new_indices = idx0[0:min_c] + idx1[0:min_c]
-    print(len(new_indices))
-    print(train_data.shape)
     train_data = train_data[new_indices, :, :, :]
     train_labels = train_labels[new_indices]
 
