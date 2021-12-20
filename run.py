@@ -144,7 +144,7 @@ def main():
 
         # generating and saving the prediction masks for the testset
         for k in range(1, len(results)+1):
-            save_predictions(img, 'test%d'%k)
+            save_predictions(results[k-1], 'test%d'%k)
 
         # generating the prediction file for the test set
         submission_filename = 'predictions/m%d_pred.csv' % (i+1)
@@ -183,7 +183,8 @@ def main():
     df = pd.concat([df1,df2,df3,df4,df5], axis=1)
 
     # inspecting the dataframe to ensure correct loading
-    df.head()
+    print(df.head())
+    df.to_csv('test.csv')
 
     # generating predictions, predicting road if all models predict road
     df['prediction'] = df.apply(lambda x: 1 if np.sum(x)>4 else 0, axis=1)
