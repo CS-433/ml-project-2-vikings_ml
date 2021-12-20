@@ -80,11 +80,11 @@ There are two main ways to run the code. We recommend using the pre-trained mode
 
 To run the project, you have to download the trained model files from https://drive.google.com/drive/folders/1o5Rg-aVe2lkL_pcW1sLoRvFd2xuay8hn?usp=sharing as the files with the model parameters are too large to be pushed to GitHub. After downloading the files, put the folder into the repository.
 
-After navigating to the project directry, you might run the following command to run the model without training from scratch:
-`python3 run.py False`
+After navigating to the project directry, you might run the following command to run the model without training from scratch:\
+`$ python3 run.py False`
 
-For training from scratch, you can run:
-`python3 run.py True`
+For training from scratch, you can run:\
+`$ python3 run.py True`
 
 This will yield a prediction file `ensemble.csv`.
 
