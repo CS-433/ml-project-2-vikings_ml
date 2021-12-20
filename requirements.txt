@@ -3,6 +3,9 @@ keras==2.7.0
 tensorflow==2.7.0
 scikit-learn==1.0.1
 opencv-python==4.5.4.60
+Pillow==8.3.2
+google-api-python-client 2.33.0
+seaborn
 matplotlib
 numpy
 pandas
