@@ -2,6 +2,7 @@ import numpy as np
 import cv2
 import re
 import matplotlib.image as mpimg
+from sklearn.metrics import f1_score
 
 def patch_to_label(patch, thr):
   '''
@@ -186,6 +187,7 @@ def test_threshold(preds, gts, min, max):
   # saving highest f1-score 
   highest = 0
   foreground_threshold = 0
+  patch_size = 16
   # iterating through each threshold and calculating F1-score and accuracy
   for thr in thresholds:
 
@@ -210,7 +212,6 @@ def test_threshold(preds, gts, min, max):
 
     # calculating and storing f1-score and accuracy
     f1 = f1_score(y_val_flattened, y_pred_flattened)
-    acc = accuracy_score(y_val_flattened, y_pred_flattened)
     f1s.append(f1)
 
     # setting foreground_threshold for future predcitions to thr if thr gives the best f1-score
