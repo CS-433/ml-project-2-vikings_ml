@@ -43,7 +43,7 @@ def window_predict(img, model):
     pred: ndarray
         The predicted image
     '''
-    # cropping the images into images of size 256x256
+    # cropping the image into images of size 256x256
     img1 = img[0:256,0:256,:]
     img2 = img[0:256,256:512,:]
     img3 = img[0:256,352:608,:]
