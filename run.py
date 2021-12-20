@@ -38,7 +38,7 @@ X4 = 'predictions/m4_pred.csv'
 X5 = 'predictions/m5_pred.csv'
 
 # defining if model should be trained or not
-TRAIN = sys.argv[0] 
+TRAIN = sys.argv[1] 
 
 # defining backbone for the model
 BACKBONE = 'resnet34'
@@ -112,7 +112,7 @@ def main():
             y_pred = model.predict(x_val)
             
             # finding optimal threshold on validation set
-            thr = test_threshold(y_pred, y_val, 0, 2)
+            thr = test_threshold(y_pred, y_val, 0, 1)
 
             # adding the optimal threshold to the thresholds array
             thresholds[i] = thr
