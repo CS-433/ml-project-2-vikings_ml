@@ -97,7 +97,7 @@ class UNet():
         # Concatenation with the correspondingly (cropped) feature map from the contracting path
         x = Add()([up_conv, saved_layer])
 
-        # shared resblock
+        # Shared resblock
         fx = func(x)
         out = Add()([x, fx])
         out = ReLU()(out)
