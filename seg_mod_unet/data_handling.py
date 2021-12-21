@@ -44,9 +44,10 @@ def extract_data_test(folderpath):
     data: ndarray
         A numpy array containting the images
     """
+    files = os.listdir(folderpath)
     imgs = []
-    for i in range(1, 51):
-        img = mpimg.imread(folderpath+'test_%d.png' % i)
+    for file in files:
+        img = mpimg.imread(folderpath+file)
         imgs.append(img)
     data = np.asarray(imgs)
     return data

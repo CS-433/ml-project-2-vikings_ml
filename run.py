@@ -188,10 +188,6 @@ def main():
     # Dataframe containing the prediction of all models for each patch
     df = pd.concat([df1, df2, df3, df4, df5], axis=1)
 
-    # Inspecting the dataframe to ensure correct loading
-    print(df.head())
-    df.to_csv('test.csv')
-
     # Generating predictions, predicting road if all models predict road
     df['prediction'] = df.apply(lambda x: 1 if np.sum(x) > 4 else 0, axis=1)
 
