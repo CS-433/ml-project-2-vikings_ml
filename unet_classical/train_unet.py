@@ -1,3 +1,5 @@
+""" Training of our original UNet. """
+
 from Unet import UNet
 from data_handling_unet import create_data_model
 from tensorflow import keras
