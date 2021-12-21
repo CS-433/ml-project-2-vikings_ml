@@ -3,7 +3,8 @@ import matplotlib.pyplot as plt
 import os
 import cv2
 
-#TODO: Remove resizing and only crop 256x256 images. I did this myself for the final prediction you see
+# TODO: Remove resizing and only crop 256x256 images. I did this myself for the final prediction you see
+
 
 def random_crop(img, mask, min_size=100):
     """
@@ -25,12 +26,13 @@ def random_crop(img, mask, min_size=100):
     sliced_mask : ndarray
         Random slice of ground truth mask
     """
+
     # Select a random subset of rows >= min size
-    row_end = np.random.randint(min_size,img.shape[0]+1)
-    row_start = np.random.randint(0,row_end - min_size+1)
+    row_end = np.random.randint(min_size, img.shape[0]+1)
+    row_start = np.random.randint(0, row_end - min_size+1)
 
     # Select a random subset of columns >= min size
-    col_end = np.random.randint(min_size,img.shape[1]+1)
+    col_end = np.random.randint(min_size, img.shape[1]+1)
     col_start = np.random.randint(0, col_end - min_size+1)
 
     # Slice image
@@ -41,8 +43,7 @@ def random_crop(img, mask, min_size=100):
 
 
 def rescale(img, mask, row_num=256, col_num=256):
-    """
-    Rescales the image into size 256 x 256
+    """ Rescaling the image into size 256 x 256
 
     Parameters
     ----------
@@ -62,16 +63,16 @@ def rescale(img, mask, row_num=256, col_num=256):
     rescaled_mask : ndarray
         Rescaled version of input mask to shape (row_num x col_num)
     """
+
     rescaled_image = cv2.resize(img, dsize=(row_num, col_num))
     rescaled_mask = cv2.resize(mask, dsize=(row_num, col_num))
-    
+
     return rescaled_image, rescaled_mask
 
 
 def crop_and_rescale(img, mask):
-    """
-    Makes a random crop and rescales the image back into size 256 x 256
-    
+    """ Making a random crop and rescales the image back into size 256 x 256
+
     Parameters
     ----------
     img: ndarray
@@ -89,14 +90,14 @@ def crop_and_rescale(img, mask):
 
     crop_img, crop_mask = random_crop(img, mask)
     crop_rescale_img, crop_rescale_mask = rescale(crop_img, crop_mask)
-    
+
     return crop_rescale_img, crop_rescale_mask
 
 
 def rotate_and_rescale(img, mask):
-    """
-    Makes a random rotation of the inputs, zooms in to crop out black fields after rotation and rescales the image back into size 256 x 256
-    
+    """ Making a random rotation of the inputs, zooms in to crop out black fields after rotation and rescales the 
+    image back into size 256 x 256.
+
     Parameters
     ----------
     img: ndarray
@@ -113,9 +114,9 @@ def rotate_and_rescale(img, mask):
     """
 
     # Pick random angle of rotation
-    deg = np.random.randint(0,361)
+    deg = np.random.randint(0, 361)
 
-    # Determine coordinates of inner square to crop out black fields after any rotation. 
+    # Determine coordinates of inner square to crop out black fields after any rotation.
     angle = deg
     while angle > 180:
         angle = angle - 180
@@ -124,20 +125,21 @@ def rotate_and_rescale(img, mask):
     end = int(400 - start)
 
     # Rotate
-    M = cv2.getRotationMatrix2D(((img.shape[0] // 2, img.shape[1] // 2)), deg, 1.0)
+    M = cv2.getRotationMatrix2D(
+        ((img.shape[0] // 2, img.shape[1] // 2)), deg, 1.0)
     rotated_image = cv2.warpAffine(img, M, (img.shape[0], img.shape[1]))
     rotated_mask = cv2.warpAffine(mask, M, (mask.shape[0], mask.shape[1]))
-    
+
     # Rescale
-    rot_rescale_img, rot_rescale_mask = rescale(rotated_image[start:end, start:end], rotated_mask[start:end, start:end])
+    rot_rescale_img, rot_rescale_mask = rescale(
+        rotated_image[start:end, start:end], rotated_mask[start:end, start:end])
 
     return rot_rescale_img, rot_rescale_mask
 
 
 def apply_gaussian_blur(img):
-    """
-    Applies a gaussian blur to an image with a random kernel standard deviation
-    
+    """ Applying a gaussian blur to an image with a random kernel standard deviation
+
     Parameters
     ----------
     img: ndarray
@@ -148,20 +150,19 @@ def apply_gaussian_blur(img):
     img: ndarray
         Rotated and rescaled version of input image 
     """
-    
-    # Get random gaussian kernel standard deviation between 0 and 3
-    std = np.random.uniform(0,3)
 
-    # apply gaussian blur
-    img = cv2.GaussianBlur(img,(15,15), std)
+    # Get random gaussian kernel standard deviation between 0 and 3
+    std = np.random.uniform(0, 3)
+
+    # Apply gaussian blur
+    img = cv2.GaussianBlur(img, (15, 15), std)
 
     return img
 
 
 def apply_color_filter(img):
-    """
-    Applies a color filter either making colors warmer or colder. 
-    
+    """ Applying a color filter either making colors warmer or colder. 
+
     Parameters
     ----------
     img: ndarray
@@ -173,7 +174,7 @@ def apply_color_filter(img):
         Color filtered image
     """
     # Get random number to determine which filter to apply
-    rand = np.random.randint(1,3)
+    rand = np.random.randint(1, 3)
 
     if rand == 1:
         # Make colors warmer
@@ -181,14 +182,13 @@ def apply_color_filter(img):
     else:
         # Make colors colder
         img_color = cv2.cvtColor(img, cv2.COLOR_RGB2XYZ)
-    
+
     return img_color
 
 
 def filter_color_and_blur(img):
-    """
-    Applies a random blur and color filter
-    
+    """ Applying a random blur and color filter.
+
     Parameters
     ----------
     img: ndarray
@@ -201,13 +201,12 @@ def filter_color_and_blur(img):
     """
     img = apply_gaussian_blur(img)
     img = apply_color_filter(img)
-    
+
     return img
 
 
 def augment(img, mask, crop_num=4, rot_num=3, filter_num=1):
-    """
-    Given image and corresponding mask, creates crop_num * rot_num * (filter_num + 1) augmentations
+    """ Given image and corresponding mask, creates crop_num * rot_num * (filter_num + 1) augmentations.
 
     Parameters
     ----------
@@ -229,24 +228,26 @@ def augment(img, mask, crop_num=4, rot_num=3, filter_num=1):
     mask_list : ndarray
         The image augmentations for the given ground truth. 
     """
+    
     # Instantiate variables to hold all augmentations of the picture
     img_list = []
     mask_list = []
 
-    # Make a given number of random crops 
+    # Make a given number of random crops
     for i in range(crop_num):
         img_crop, mask_crop = crop_and_rescale(img, mask)
-        
+
         # Store pictures
         img_list.append(img_crop)
         mask_list.append(mask_crop)
-        
+
         # Create a filtered version (only applied to image and not mask)
         for i in range(filter_num):
             img_list.append(filter_color_and_blur(img_crop))
             mask_list.append(mask_crop)
 
     assert len(img_list) == 8
+    
     # Rotate each picture a given number of times
     img_list_len = len(img_list)
     for k in range(img_list_len):
@@ -254,13 +255,12 @@ def augment(img, mask, crop_num=4, rot_num=3, filter_num=1):
             img_rot, mask_rot = rotate_and_rescale(img_list[k], mask_list[k])
             img_list.append(img_rot)
             mask_list.append(mask_rot)
-        
+
     return img_list, mask_list
 
 
 def augment_dir(dir_images, dir_masks, destination_dir_images, destination_dir_masks):
-    """
-    Goes through the two directories and creates a folder in each of the directories with the feature augmented data set. 
+    """ Going through the two directories and creates a folder in each of the directories with the feature augmented data set. 
 
     Parameters
     ----------
@@ -273,6 +273,7 @@ def augment_dir(dir_images, dir_masks, destination_dir_images, destination_dir_m
     destination_dir_masks: str
         Directory of where to store the corresponding augmented ground truths
     """
+
     # Load the images
     images = os.listdir(dir_images)
     masks = os.listdir(dir_masks)
@@ -282,16 +283,16 @@ def augment_dir(dir_images, dir_masks, destination_dir_images, destination_dir_m
         # Only load pictures
         if images[i][-3:] != "png" or masks[i][-3:] != "png":
             continue
-        
+
         # Create folders to store augmentations
-        folders = ["90-split","10-split"]
+        folders = ["90-split", "10-split"]
         for folder_name in folders:
             if not os.path.exists(os.path.join(destination_dir_images, folder_name)):
                 os.makedirs(os.path.join(destination_dir_images, folder_name))
             if not os.path.exists(os.path.join(destination_dir_masks, folder_name)):
                 os.makedirs(os.path.join(destination_dir_masks, folder_name))
-        
-        # store in 10-split folder if the picture is one of the last 10
+
+        # Store in 10-split folder if the picture is one of the last 10
         id = int(images[i][-7:-4])
         print(id)
         if id > 90:
@@ -308,26 +309,30 @@ def augment_dir(dir_images, dir_masks, destination_dir_images, destination_dir_m
 
         # Save each augmentation
         for j in range(len(img_list)):
-           
+
             # Create filenames and save
-            img_filename = os.path.join(destination_dir_images, folder, images[i])[0:-4] + f"_Aug{str(j).zfill(2)}" + ".png"
-            mask_filename = os.path.join(destination_dir_masks, folder, masks[i])[0:-4] + f"_Aug{str(j).zfill(2)}" + ".png"
+            img_filename = os.path.join(destination_dir_images, folder, images[i])[
+                0:-4] + f"_Aug{str(j).zfill(2)}" + ".png"
+            mask_filename = os.path.join(destination_dir_masks, folder, masks[i])[
+                0:-4] + f"_Aug{str(j).zfill(2)}" + ".png"
             cv2.imwrite(img_filename, img_list[j])
             cv2.imwrite(mask_filename, mask_list[j])
-        
-        # Save original resized picture 
+
+        # Save original resized picture
         img_filename = os.path.join(destination_dir_images, folder, images[i])
         mask_filename = os.path.join(destination_dir_masks, folder, masks[i])
-        img_rescaled, mask_rescaled = rescale(img, mask, row_num=256, col_num=256)
+        img_rescaled, mask_rescaled = rescale(
+            img, mask, row_num=256, col_num=256)
         cv2.imwrite(img_filename, img_rescaled)
         cv2.imwrite(mask_filename, mask_rescaled)
 
+
 #TODO: Filepaths
 if __name__ == "__main__":
-    dir_images = "/Users/nikolaibeckjensen/Desktop/training/images" 
+    dir_images = "/Users/nikolaibeckjensen/Desktop/training/images"
     dir_masks = "/Users/nikolaibeckjensen/Desktop/training/groundtruth"
     destination_dir_images = "/Users/nikolaibeckjensen/Desktop/ml-project-2-vikings_ml/data/training_double/images"
     destination_dir_masks = "/Users/nikolaibeckjensen/Desktop/ml-project-2-vikings_ml/data/training_double/groundtruth"
-    
-    augment_dir(dir_images, dir_masks, destination_dir_images, destination_dir_masks)
-    
+
+    augment_dir(dir_images, dir_masks,
+                destination_dir_images, destination_dir_masks)
