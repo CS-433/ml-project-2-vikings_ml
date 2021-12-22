@@ -128,7 +128,7 @@ The script `run.py` generates the submission uploaded to AICrowd with submission
 
 The file `report.pdf` contains our report documenting the project. Complimentary to this is the `story.ipynb` notebook, where we try to show our experimenting throughout the project.
 
-We would like to point out that the files containing helper functions in the different folders, such as `helpers.py`, `handling_images.py` and `data_handling.py`, contains quite similar functions. However, many of them are modified for the concrete use in the folders models.
+We would like to point out that the files containing helper functions in the different folders, such as `helpers.py`, `handling_images.py` and `data_handling.py`, contains quite similar functions. However, many of them are modified for the concrete use in the folders' models.
 
 ## Comments on `segmentation_models`
 
