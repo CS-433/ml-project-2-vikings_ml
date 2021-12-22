@@ -128,6 +128,8 @@ The script `run.py` generates the submission uploaded to AICrowd with submission
 
 The file `report.pdf` contains our report documenting the project. Complimentary to this is the `story.ipynb` notebook, where we try to show our experimenting throughout the project.
 
+We would like to point out that the files containing helper functions in the different folders, such as `helpers.py`, `handling_images.py` and `data_handling.py`, contains quite similar functions. However, many of them are modified for the concrete use in the folders models.
+
 ## Comments on `segmentation_models`
 
 [`segmentation_models`](https://github.com/qubvel/segmentation_models) is a Python library consisting of implemented Neural Networks for image segmentation provided by Pavel Yakubovskiy. The models are based on Keras and TensorFlow. The library is easy to use with an understandable API and provides different NN architectures with several available backbones, e.g., architectures for the encoding layers. We have mainly utilized the UNet architecture with a ResNet34 backbone, but have also experimented with different architectures and backbones. The complete documentation for the library can be found [here](https://segmentation-models.readthedocs.io/en/latest/index.html).
