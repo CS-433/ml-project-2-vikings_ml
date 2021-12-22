@@ -1,4 +1,4 @@
-''' Helper functions for handling images baseline.py provided by the course staff and ETH. '''
+''' Helper functions for handling images provided by the course staff and ETH. '''
 
 import numpy as np
 import os
