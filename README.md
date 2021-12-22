@@ -2,11 +2,11 @@
 
 ## Description
 
-This project is the second of two in the EPFL course "CS-433 Machine Learning". The aim of the project is solve the AICrowd challenge Road Segmentation hosted by MLO EPFL. The challenge aims to train machine learning models that segment roads from background in satelitte images.
+This project is the second of two in the EPFL course "CS-433 Machine Learning". The project aims to solve the AICrowd challenge Road Segmentation hosted by MLO EPFL. The challenge aims to train machine learning models that segment roads from the background in satellite images.
 
-A complete challenge description as well as the training and test data provided, can be found [here](https://www.aicrowd.com/challenges/epfl-ml-road-segmentation).
+A complete challenge description, as well as the training and test data provided, can be found [here](https://www.aicrowd.com/challenges/epfl-ml-road-segmentation).
 
-To best understand the implementations we did during the competition, we reccommend reading the report and the corresponding `story.ipynb` notebook. The report outlines the theoretical background and results from our implementations while the `story.ipynb` shows our progress and predictions. 
+We recommend reading the report and the corresponding `story.ipynb` notebook to best understand the implementations we did during the competition. The report outlines our implementations' theoretical background and results, while the `story.ipynb` shows our progress and predictions.
 
 ## Overview of Folder Structure
 
@@ -127,6 +127,10 @@ The script `augmentation.py` contains the functions used to generate augmentatio
 The script `run.py` generates the submission uploaded to AICrowd with submission ID [#167620](https://www.aicrowd.com/challenges/epfl-ml-road-segmentation/submissions/167620). This is the submission which recieved an F1-score of 0.901 and that is referred to in the project report.
 
 The file `report.pdf` contains our report documenting the project. Complimentary to this is the `story.ipynb` notebook, where we try to show our experimenting throughout the project.
+
+### Comments on `segmentation_models`
+
+[`segmentation_models`](https://github.com/qubvel/segmentation_models) is a Python library consisting of implemented Neural Networks for image segmentation provided by Pavel Yakubovskiy. The models are based on Keras and TensorFlow. The library is easy to use with a understandable API, and provides different NN architectures with several available backbones, e.g., architectures for the encoding layers. We have mainly utilized the UNet architecture with a ResNet34 backbones, but have also experimented with different architectures and backbones. The entire documentation for the library could be found [here](https://segmentation-models.readthedocs.io/en/latest/index.html).
 
 ## Authors
 
