@@ -8,6 +8,41 @@ A complete challenge description, as well as the training and test data provided
 
 We recommend reading the report and the corresponding `story.ipynb` notebook to best understand the implementations we did during the competition. The report outlines our implementations' theoretical background and results, while the `story.ipynb` shows our progress and predictions.
 
+## Installing and Running the Code
+
+Start by pulling from GitHub as follows:\
+`$ git clone https://github.com/CS-433/ml-project-2-ml_vikings.git` \
+`$ cd ml-project-2-ml_vikings`
+
+The project uses the following external libraries
+
+- `segmentation_models`
+- TensorFlow
+- Keras
+- SciKit Learn
+
+If these libraries are not currently installed in your environment, they can be installed installing the `requirements.txt` file with the following command:\
+`$ pip install -r requirements.txt`
+
+There are two main ways to run the code. We recommend using the pre-trained models, i.e. load the models from memory to test and predict, but the model can also be trained from scratch. Below, the instructions for each of the options follows:
+
+**Trained models**
+
+To run the project, you have to download the trained model files from https://drive.google.com/drive/folders/1o5Rg-aVe2lkL_pcW1sLoRvFd2xuay8hn?usp=sharing as the files with the model parameters are too large to be pushed to GitHub. After downloading the files, put the folder into the repository.
+
+After navigating to the project directry, you might run the following command to run the model without training from scratch:\
+`$ python3 run.py False`
+
+This will yield a prediction file `ensemble.csv`.
+
+**Train model from scratch**
+
+If you want to train the model from scratch, we reccommend using Google Colab as the model is computionally expensive to train. Other GPU services can also be utlized, but we provide the instructions for Colab.
+
+1. Create a shortcut on the "desktop" of your Google Drive of this folder: https://drive.google.com/drive/folders/1-3Rjf92mn-WFVhhwdblE1-VnflLfw74X?usp=sharing
+2. Find the file `final_model.ipynb` in the seg_model_unet folder in this repository and upload it to Google Colab
+3. Run the code cells in the notebook in chronological order and a prediction file named `ensemble.ipynb` will appear in the file directory on the left
+
 ## Overview of Folder Structure
 
 ```
@@ -65,41 +100,6 @@ We recommend reading the report and the corresponding `story.ipynb` notebook to 
 ├── story.ipynb
 └── requirements.txt
 ```
-
-## Installing and Running the Code
-
-Start by pulling from GitHub as follows:\
-`$ git clone https://github.com/CS-433/ml-project-2-ml_vikings.git` \
-`$ cd ml-project-2-ml_vikings`
-
-The project uses the following external libraries
-
-- `segmentation_models`
-- TensorFlow
-- Keras
-- SciKit Learn
-
-If these libraries are not currently installed in your environment, they can be installed installing the `requirements.txt` file with the following command:\
-`$ pip install -r requirements.txt`
-
-There are two main ways to run the code. We recommend using the pre-trained models, i.e. load the models from memory to test and predict, but the model can also be trained from scratch. Below, the instructions for each of the options follows:
-
-**Trained models**
-
-To run the project, you have to download the trained model files from https://drive.google.com/drive/folders/1o5Rg-aVe2lkL_pcW1sLoRvFd2xuay8hn?usp=sharing as the files with the model parameters are too large to be pushed to GitHub. After downloading the files, put the folder into the repository.
-
-After navigating to the project directry, you might run the following command to run the model without training from scratch:\
-`$ python3 run.py False`
-
-This will yield a prediction file `ensemble.csv`.
-
-**Train model from scratch**
-
-If you want to train the model from scratch, we reccommend using Google Colab as the model is computionally expensive to train. Other GPU services can also be utlized, but we provide the instructions for Colab.
-
-1. Create a shortcut on the "desktop" of your Google Drive of this folder: https://drive.google.com/drive/folders/1-3Rjf92mn-WFVhhwdblE1-VnflLfw74X?usp=sharing
-2. Find the file `final_model.ipynb` in the seg_model_unet folder in this repository and upload it to Google Colab
-3. Run the code cells in the notebook in chronological order and a prediction file named `ensemble.ipynb` will appear in the file directory on the left
 
 ## Overview of Key Files and Folders
 
