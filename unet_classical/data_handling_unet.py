@@ -27,23 +27,19 @@ class SatImageSequence(keras.utils.Sequence):
         y_gen = np.array([mpimg.imread(file_name)[:,:,0] if len(mpimg.imread(file_name).shape)==3 else mpimg.imread(file_name) for file_name in batch_y])
         return x_gen, y_gen
 
-def create_data_model(split=0.8, batch_size=8):
+def create_data_model(batch_size=8):
+    "Function creating a data model to be used in Unet architecture from augmented data in folders"
+
     # File paths
     data_dir = 'data/training/'
-    train_data_filename = data_dir + 'images/'
-    train_labels_filename = data_dir + 'groundtruth/'
+    train_data_filename = data_dir + 'images/90-split'
+    train_labels_filename = data_dir + 'groundtruth/90-split'
+    test_data_filename = data_dir + 'images/10-split'
+    test_labels_filename = data_dir + 'groundtruth/10-split'
 
-    # Loading training data
-    input_img_paths, target_img_paths = extract_data_unet(train_data_filename, train_labels_filename)
-
-    # Splitting our image paths into a training and a validation set
-    val_samples = math.ceil((1-split)*len(input_img_paths))
-    random.Random(1337).shuffle(input_img_paths)
-    random.Random(1337).shuffle(target_img_paths)
-    train_input_img_paths = input_img_paths[:-val_samples]
-    train_target_img_paths = target_img_paths[:-val_samples]
-    val_input_img_paths = input_img_paths[-val_samples:]
-    val_target_img_paths = target_img_paths[-val_samples:]
+    # Loading training and local test data
+    train_input_img_paths, train_target_img_paths = extract_data_unet(train_data_filename, train_labels_filename)
+    val_input_img_paths, val_target_img_paths = extract_data_unet(test_data_filename, test_labels_filename)
 
     # Instantiate data sequences for each split
     train_gen = SatImageSequence(x_set=train_input_img_paths, y_set=train_target_img_paths,batch_size=batch_size)

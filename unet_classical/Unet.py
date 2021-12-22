@@ -1,4 +1,4 @@
-""" Implementation of our original UNet. """
+""" Implementation of our original UNet and ladderNet expansions. """
 
 import tensorflow as tf
 from tensorflow import keras
@@ -41,37 +41,6 @@ class UNet():
 
         return saved_layer, conv_maxpool
 
-    def res(self, depth, kernelsize=(3, 3)):
-        """ Creating a residual block. """
-        model = keras.Sequential([
-            Conv2D(2**depth * self.filter_num, kernelsize,
-                   activation='relu', padding=self.pad),
-            BatchNormalization(),
-            Conv2D(2**depth * self.filter_num, kernelsize, padding=self.pad)])
-        return model
-
-    def encoder_ladder(self, input, depth, func, add=[], first=False):
-        """ Encoder for the UNet. """
-
-        # Add convolution, residual block, maxpool
-        x = Conv2D(2**depth * self.filter_num, (3, 3),
-                   padding=self.pad, kernel_initializer='he_normal')(input)
-        print(f"depth: {depth}")
-
-        # Add if not the first Unet
-        if not first:
-            x = Add()([x, add])
-
-        # Shared weights
-        fx = func(x)
-        out = Add()([x, fx])
-        out = ReLU()(out)
-        saved_layer = BatchNormalization()(out)
-
-        conv_maxpool = MaxPool2D(strides=(2, 2))(saved_layer)
-
-        return saved_layer, conv_maxpool
-
     def decoder(self, input, saved_layer, depth):
         """ Decoder for the expansive path of the UNet (right). """
 
@@ -84,24 +53,6 @@ class UNet():
 
         # 3x3 convolution
         result = self.conv_3x3(up_conv_cat, depth)
-
-        return result
-
-    def decoder_ladder(self, input, saved_layer, depth, func):
-        """ Decoder for the expansive path of the ladderNet(right). """
-
-        # 2x2 convolution (“up-convolution”), upsampling
-        up_conv = Conv2DTranspose(
-            2**depth * self.filter_num, (3, 3), strides=2, padding="same")(input)
-
-        # Concatenation with the correspondingly (cropped) feature map from the contracting path
-        x = Add()([up_conv, saved_layer])
-
-        # Shared resblock
-        fx = func(x)
-        out = Add()([x, fx])
-        out = ReLU()(out)
-        result = BatchNormalization()(out)
 
         return result
 
@@ -132,9 +83,60 @@ class UNet():
         model = keras.models.Model(input, output)
         return model
 
-    def get_model_ladder(self, image_shape):
-        """ Creating the ladder-net architecture (consisting of two U-nets) for a picture with a given input size. """
+class LadderNet():
+    """ U-net neural network architecture"""
 
+    def res(self, depth, kernelsize=(3, 3)):
+        """ Creating a residual block. """
+        model = keras.Sequential([
+            Conv2D(2**depth * self.filter_num, kernelsize,
+                    activation='relu', padding=self.pad),
+            BatchNormalization(),
+            Conv2D(2**depth * self.filter_num, kernelsize, padding=self.pad)])
+        return model
+
+    def encoder_ladder(self, input, depth, func, add=[], first=False):
+        """ Encoder for the LadderNet. """
+
+        # Add convolution, residual block, maxpool
+        x = Conv2D(2**depth * self.filter_num, (3, 3),
+                   padding=self.pad, kernel_initializer='he_normal')(input)
+        print(f"depth: {depth}")
+
+        # Add if not the first Unet
+        if not first:
+            x = Add()([x, add])
+
+        # Shared weights
+        fx = func(x)
+        out = Add()([x, fx])
+        out = ReLU()(out)
+        saved_layer = BatchNormalization()(out)
+
+        conv_maxpool = MaxPool2D(strides=(2, 2))(saved_layer)
+
+        return saved_layer, conv_maxpool
+
+    def decoder_ladder(self, input, saved_layer, depth, func):
+        """ Decoder for the expansive path of the LadderNet(right). """
+
+        # 2x2 convolution (“up-convolution”), upsampling
+        up_conv = Conv2DTranspose(
+            2**depth * self.filter_num, (3, 3), strides=2, padding="same")(input)
+
+        # Concatenation with the correspondingly (cropped) feature map from the contracting path
+        x = Add()([up_conv, saved_layer])
+
+        # Shared resblock
+        fx = func(x)
+        out = Add()([x, fx])
+        out = ReLU()(out)
+        result = BatchNormalization()(out)
+
+        return result
+
+    def get_model(self, image_shape):
+        """ Creating the ladder-net architecture (consisting of two U-nets) for a picture with a given input size. """
         input = keras.Input(shape=image_shape)
 
         # Contracting path (left side) of the network architecture
