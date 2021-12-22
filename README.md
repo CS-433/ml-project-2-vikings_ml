@@ -54,9 +54,8 @@ To best understand the implementations we did during the competition, we reccomm
 │
 ├── seg_mod_unet
 │   ├── data_handling.py
-│   ├── ensemble_model.ipynb
 │   ├── final_model.ipynb
-│   ├── helpers.py
+│   └── helpers.py
 │
 ├── predictions
 │   └── .
