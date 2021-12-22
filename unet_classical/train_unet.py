@@ -14,7 +14,7 @@ if __name__ == "__main__":
     train_gen, val_gen = create_data_model(split=0.2)
 
     # Train and save best model
-    epochs = 3
+    epochs = 30
     model.compile(optimizer="adam", loss="binary_crossentropy", metrics=['accuracy'])
     callbacks = [keras.callbacks.ModelCheckpoint("Unet_roadsegment1.h5", save_best_only=True)]
     model.fit(train_gen, epochs=epochs, validation_data=val_gen, callbacks=callbacks)
