@@ -2,7 +2,7 @@
 
 ## Description
 
-This project is the second of two in the EPFL course "CS-433 Machine Learning". The aim of the project is solve the AICrowd challenge Road Segmenation hosted by MLO EPFL. The challenge aims to train machine learning models that segment roads from background in satelitte images.
+This project is the second of two in the EPFL course "CS-433 Machine Learning". The aim of the project is solve the AICrowd challenge Road Segmentation hosted by MLO EPFL. The challenge aims to train machine learning models that segment roads from background in satelitte images.
 
 A complete challenge description as well as the training and test data provided, can be found [here](https://www.aicrowd.com/challenges/epfl-ml-road-segmentation).
 
@@ -25,18 +25,26 @@ To best understand the implementations we did during the competition, we reccomm
 │   │   └── images
 │   │       ├── 10-split
 │   │       └── 90-split
-│   └── training_double
+│   ├── training_double
+│   │   ├── groundtruth
+│   │   │   ├── 10-split
+│   │   │   └── 90-split
+│   │   └── images
+│   │       ├── 10-split
+│   │       └── 90-split
+│   └── training_final
 │       ├── groundtruth
 │       │   ├── 10-split
 │       │   └── 90-split
 │       └── images
 │           ├── 10-split
 │           └── 90-split
+│
 ├── baseline
 │   ├── logistic.ipynb
 │   ├── baseline.py
-│   └── handling_images.py
-    └── helpers.py
+│   ├── handling_images.py
+│   └── helpers.py
 │
 ├── unet_classical
 │   ├── Unet.py
@@ -99,11 +107,22 @@ If you want to train the model from scratch, we reccommend using Google Colab as
 
 The folder `data/` contains the original train and test data as well as the two augmented setups, `training` and `training_double`, with a 90/10 split, and finally `training_final` which is similar to the `training` folder, but all crops is of size 256x256 without resizing and there is no 90/10 split. All the augmented setups contains an `images` and a `groundtruth` folder.
 
-The folder `baseline/` contains the implementation and the scripts to train the baseline CNN and the simple logistic regression.
+The folder `baseline/` contains the implementation and the scripts to train the baseline CNN and the simple logistic regression:
+* `baseline.py` contains the code for the baseline CNN provided by the course staff, and is credited to Aurelien Lucchi (ETH).
+* `handling_images.py` provides functions for handling images in `baseline.py`, and should also be credited to Lucchi.
+* `logistic.ipynb` contains our implementation of a logistic regression baseline.
+* `helpers.py` provides several helper functions for the logistic regression that are provided by the course staff.
 
 The folder `unet_classical/` contains the implementation and the scripts to train our first UNet implementation. This UNet is implemented by ourselves using TensorFlow.
+* `data_handling_unet.ipynb` contains helper functions for data handling related to our UNet model.
+* `Unet.py` contains our UNet model as well as the LadderNet expansion.
+* `train_unet.py` contains training of our UNet.
+* `run_unet_nb.ipynb` contains training of our UNet.
 
-The folder `seg_mod_unet/` contains the implementation and the scripts to train the ensemble of UNets with the resnet34 backbone. These UNets are implemented by using the `segmentation_models` library.
+The folder `seg_mod_unet/` contains the implementation and the scripts to train the ensemble of UNets with the ResNet34 backbone. These UNets are implemented by using the `segmentation_models` library.
+* `data_handling.py` contains helper functions for handling images provided by the course staff and ETH.
+* `final_model.ipynb` handles the data processing, modelling, predictions, and post-processing for the Unet with ResNet34 architecture.
+* `helpers.py` contains helper functions utilized in `final_model.ipynb`.
 
 The script `augmentation.py` contains the functions used to generate augmentations of the original data set.
 
