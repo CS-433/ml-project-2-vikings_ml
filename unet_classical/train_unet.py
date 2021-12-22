@@ -10,7 +10,7 @@ if __name__ == "__main__":
     # Load Unet NN architecture
     model = UNet().get_model(image_shape=(400,400,3))
 
-    # Create data model. Split= % of data to be used as training. T0DØ: batchsize param + augmented pictures
+    # Create data model. Split = % of data to be used as training.
     train_gen, val_gen = create_data_model(split=0.2)
 
     # Train and save best model
