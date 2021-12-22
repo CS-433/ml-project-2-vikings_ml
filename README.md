@@ -130,7 +130,7 @@ The file `report.pdf` contains our report documenting the project. Complimentary
 
 ### Comments on `segmentation_models`
 
-[`segmentation_models`](https://github.com/qubvel/segmentation_models) is a Python library consisting of implemented Neural Networks for image segmentation provided by Pavel Yakubovskiy. The models are based on Keras and TensorFlow. The library is easy to use with a understandable API, and provides different NN architectures with several available backbones, e.g., architectures for the encoding layers. We have mainly utilized the UNet architecture with a ResNet34 backbones, but have also experimented with different architectures and backbones. The entire documentation for the library could be found [here](https://segmentation-models.readthedocs.io/en/latest/index.html).
+[`segmentation_models`](https://github.com/qubvel/segmentation_models) is a Python library consisting of implemented Neural Networks for image segmentation provided by Pavel Yakubovskiy. The models are based on Keras and TensorFlow. The library is easy to use with an understandable API and provides different NN architectures with several available backbones, e.g., architectures for the encoding layers. We have mainly utilized the UNet architecture with a ResNet34 backbone, but have also experimented with different architectures and backbones. The complete documentation for the library can be found [here](https://segmentation-models.readthedocs.io/en/latest/index.html).
 
 ## Authors
 
