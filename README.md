@@ -60,7 +60,6 @@ To best understand the implementations we did during the competition, we reccomm
 ├── predictions
 │   └── .
 │
-├── Ensemble.ipynb
 ├── augmentation.py
 ├── run.py
 ├── story.ipynb
