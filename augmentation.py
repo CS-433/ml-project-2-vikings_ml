@@ -1,10 +1,7 @@
-""" Functions for creating augmentations of the dataset. """
-
 import numpy as np
 import matplotlib.pyplot as plt
 import os
 import cv2
-from pathlib import Path
 
 
 def random_crop(img, mask, min_size=100):
@@ -174,7 +171,6 @@ def apply_color_filter(img):
     img: ndarray
         Color filtered image
     """
-
     # Get random number to determine which filter to apply
     rand = np.random.randint(1, 3)
 
@@ -201,7 +197,6 @@ def filter_color_and_blur(img):
     img: ndarray
         Color filtered and gaussian blurred image
     """
-
     img = apply_gaussian_blur(img)
     img = apply_color_filter(img)
 
@@ -231,7 +226,7 @@ def augment(img, mask, crop_num=4, rot_num=3, filter_num=1):
     mask_list : ndarray
         The image augmentations for the given ground truth. 
     """
-
+    
     # Instantiate variables to hold all augmentations of the picture
     img_list = []
     mask_list = []
@@ -250,7 +245,7 @@ def augment(img, mask, crop_num=4, rot_num=3, filter_num=1):
             mask_list.append(mask_crop)
 
     assert len(img_list) == 8
-
+    
     # Rotate each picture a given number of times
     img_list_len = len(img_list)
     for k in range(img_list_len):

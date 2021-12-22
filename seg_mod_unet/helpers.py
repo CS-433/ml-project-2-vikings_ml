@@ -1,5 +1,3 @@
-""" Several helper functions utilized in final_model.ipynb """
-
 import numpy as np
 import cv2
 import re

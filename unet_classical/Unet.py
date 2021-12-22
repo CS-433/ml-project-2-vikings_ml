@@ -1,4 +1,4 @@
-""" Implementation of our original UNet and LadderNet expansions. """
+""" Implementation of our original UNet and ladderNet expansions. """
 
 import tensorflow as tf
 from tensorflow import keras
@@ -84,7 +84,7 @@ class UNet():
         return model
 
 class LadderNet():
-    """ LadderNet neural network architecture, an architecture consisting of two consecutive UNets. """
+    """ U-net neural network architecture"""
 
     def res(self, depth, kernelsize=(3, 3)):
         """ Creating a residual block. """
@@ -98,12 +98,12 @@ class LadderNet():
     def encoder_ladder(self, input, depth, func, add=[], first=False):
         """ Encoder for the LadderNet. """
 
-        # Adding convolution, residual block, maxpool
+        # Add convolution, residual block, maxpool
         x = Conv2D(2**depth * self.filter_num, (3, 3),
                    padding=self.pad, kernel_initializer='he_normal')(input)
         print(f"depth: {depth}")
 
-        # Adding if not the first Unet
+        # Add if not the first Unet
         if not first:
             x = Add()([x, add])
 
@@ -118,7 +118,7 @@ class LadderNet():
         return saved_layer, conv_maxpool
 
     def decoder_ladder(self, input, saved_layer, depth, func):
-        """ Decoder for the expansive path of the LadderNet (right). """
+        """ Decoder for the expansive path of the LadderNet(right). """
 
         # 2x2 convolution (“up-convolution”), upsampling
         up_conv = Conv2DTranspose(
@@ -136,7 +136,7 @@ class LadderNet():
         return result
 
     def get_model(self, image_shape):
-        """ Creating the LadderNet architecture, consisting of two U-nets, for a picture with a given input size. """
+        """ Creating the ladder-net architecture (consisting of two U-nets) for a picture with a given input size. """
         input = keras.Input(shape=image_shape)
 
         # Contracting path (left side) of the network architecture

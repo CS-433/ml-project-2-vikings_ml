@@ -20,21 +20,15 @@ class SatImageSequence(keras.utils.Sequence):
         batch_y = self.y[idx * self.batch_size:(idx + 1) * self.batch_size]
         batch_x = self.x[idx * self.batch_size:(idx + 1) * self.batch_size]
 
-        # Generating x values
+        # x values
         x_gen = np.array([mpimg.imread(file_name) for file_name in batch_x])
 
-        # Generating y values and descaling augmented pictures from 3 dimensions to 1
+        # y values. descale augmented pictures from 3 dimensions to 1
         y_gen = np.array([mpimg.imread(file_name)[:,:,0] if len(mpimg.imread(file_name).shape)==3 else mpimg.imread(file_name) for file_name in batch_y])
         return x_gen, y_gen
 
 def create_data_model(batch_size=8):
-    """ Function creating a data model to be used in Unet architecture from augmented data in folders. 
-    
-    Parameters
-    ----------
-    batch_size: int
-        The desired batch size for the model
-    """
+    "Function creating a data model to be used in Unet architecture from augmented data in folders"
 
     # File paths
     data_dir = 'data/training/'
