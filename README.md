@@ -2,9 +2,11 @@
 
 ## Description
 
-This project is the second of two in the EPFL course "CS-433 Machine Learning". The aim of the project is solve the AICrowd challenge Road Segmenation hosted by MLO EPFL.
+This project is the second of two in the EPFL course "CS-433 Machine Learning". The aim of the project is solve the AICrowd challenge Road Segmenation hosted by MLO EPFL. The challenge aims to train machine learning models that segment roads from background in satelitte images.
 
 A complete challenge description as well as the training and test data provided, can be found [here](https://www.aicrowd.com/challenges/epfl-ml-road-segmentation).
+
+To best understand the implementations we did during the competition, we reccommend reading the report and the corresponding `story.ipynb` notebook. The report outlines the theoretical background and results from our implementations while the `story.ipynb` shows our progress and predictions. 
 
 ## Overview of Folder Structure
 
@@ -33,7 +35,8 @@ A complete challenge description as well as the training and test data provided,
 ├── baseline
 │   ├── logistic.ipynb
 │   ├── baseline.py
-│   └── helpers.py
+│   └── handling_images.py
+    └── helpers.py
 │
 ├── unet_classical
 │   ├── Unet.py
@@ -46,7 +49,6 @@ A complete challenge description as well as the training and test data provided,
 │   ├── ensemble_model.ipynb
 │   ├── final_model.ipynb
 │   ├── helpers.py
-│   └── mask_to_submission.py
 │
 ├── predictions
 │   └── .
@@ -83,9 +85,6 @@ To run the project, you have to download the trained model files from https://dr
 After navigating to the project directry, you might run the following command to run the model without training from scratch:\
 `$ python3 run.py False`
 
-For training from scratch, you can run:\
-`$ python3 run.py True`
-
 This will yield a prediction file `ensemble.csv`.
 
 **Train model from scratch**
@@ -98,13 +97,13 @@ If you want to train the model from scratch, we reccommend using Google Colab as
 
 ## Overview of Key Files and Folders
 
-The folder `data/` contains the original train and test data as well as the two augmented setups, `training` and `training_double`, with a 90/10 split. Both of the augmented setups contains an `images` and a `groundtruth` folder.
+The folder `data/` contains the original train and test data as well as the two augmented setups, `training` and `training_double`, with a 90/10 split, and finally `training_final` which is similar to the `training` folder, but all crops is of size 256x256 without resizing and there is no 90/10 split. All the augmented setups contains an `images` and a `groundtruth` folder.
 
-The folder `baseline/` contains the implementation and the scripts to train the baseline CNN and simple logistic regression.
+The folder `baseline/` contains the implementation and the scripts to train the baseline CNN and the simple logistic regression.
 
-The folder `unet_classical/` contains the implementation and the scripts to train the simple UNet. This UNet is implemented by ourselves using TensorFlow.
+The folder `unet_classical/` contains the implementation and the scripts to train our first UNet implementation. This UNet is implemented by ourselves using TensorFlow.
 
-The folder `seg_mod_unet/` contains the implementation and the scripts to train the ensemble of UNets with the resnet34 backbone. These UNets are implemented by the `segmentation_models` library.
+The folder `seg_mod_unet/` contains the implementation and the scripts to train the ensemble of UNets with the resnet34 backbone. These UNets are implemented by using the `segmentation_models` library.
 
 The script `augmentation.py` contains the functions used to generate augmentations of the original data set.
 
