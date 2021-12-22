@@ -2,7 +2,7 @@
 
 ## Description
 
-This project is the second of two in the EPFL course "CS-433 Machine Learning". The project aims to solve the AICrowd challenge Road Segmentation hosted by MLO EPFL. The challenge aims to train machine learning models that segment roads from the background in satellite images. Our best submission in the project has submission ID [#167620](https://www.aicrowd.com/challenges/epfl-ml-road-segmentation/submissions/167620) on AICrowd, receiving a F1-score of 0.901.
+This project is the second of two in the EPFL course "CS-433 Machine Learning". The project aims to solve the AICrowd challenge Road Segmentation hosted by MLO EPFL. The challenge aims to train machine learning models that segment roads from the background in satellite images. Our best submission in the project has submission ID [#167620](https://www.aicrowd.com/challenges/epfl-ml-road-segmentation/submissions/167620) on AICrowd, receiving an F1-score of 0.901.
 
 A complete challenge description, as well as the training and test data provided, can be found [here](https://www.aicrowd.com/challenges/epfl-ml-road-segmentation).
 
